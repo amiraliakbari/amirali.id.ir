@@ -387,37 +387,47 @@ footer p + p {
     width: 400px;
     height: 60px;
     position: relative;
-    border: 1px solid #B2D2E1;
     padding: 6px 10px;
     text-align: center;
-
-    -webkit-border-radius: 8px 8px 8px 8px;
-    -moz-border-radius: 8px 8px 8px 8px;
-    -ms-border-radius: 8px 8px 8px 8px;
-    -o-border-radius: 8px 8px 8px 8px;
-    border-radius: 8px 8px 8px 8px;
-
-    background: #C6EAFA;
-    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ddfbfc), color-stop(100%, #c6eafa));
-    background: -webkit-linear-gradient(#ddfbfc, #c6eafa);
-    background: -moz-linear-gradient(#ddfbfc, #c6eafa);
-    background: -o-linear-gradient(#ddfbfc, #c6eafa);
-    background: -ms-linear-gradient(#ddfbfc, #c6eafa);
-    background: linear-gradient(#ddfbfc, #c6eafa);
 }
 
-#accounts-div .icon {
+#accounts-div a {
     display: inline-block;
     width: 48px;
     height: 48px;
 }
 
+#ico-gmail {
+    background-image: url('../images/gmail-48.png');
+}
+
+#ico-arsh {
+    background: 2px 0 url('../images/arsh-48.png') no-repeat;
+}
+
 #ico-github {
-    background-image: url('../images/github-48.png');
+    background: 3px 3px url('../images/github-42.png') no-repeat;
+}
+
+#ico-stack-overflow {
+    background: -2px 0 url('../images/stack-overflow-48.png');
+}
+
+#ico-ask-ubuntu {
+    background-image: url('../images/ask-ubuntu-48.png');
+}
+
+#ico-twitter {
+    background-image: url('../images/twitter-48.png');
+}
+
+#ico-phone {
+    background-image: url('../images/phone-48.png');
 }
 
 #lang-select {
     float: right;
+    direction: ltr;
     top: -42px;
 }
 

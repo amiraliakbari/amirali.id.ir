@@ -17,32 +17,40 @@
 
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/1.5/bootstrap-switch.min.js"></script>
+    <script src="javascripts/bootstrap-switch.js"></script>
+    <script src="javascripts/jquery-lang.js"></script>
+    <script src="javascripts/i18n.fa.js"></script>
     <script src="javascripts/main.js"></script>
 </head>
 <body>
     <div class="wrapper">
     <header class="without-description">
-        <h1>AmirAli Akbari</h1>
+        <h1 lang="en">AmirAli Akbari</h1>
         <div id="lang-select" class="make-switch" data-label-icon="icon-fullscreen"
-             data-on="primary" data-off="success" style="display: none"
-             data-text-label="fd" data-on-label="en" data-off-label="فارسی">
+             data-on="primary" data-off="success" data-on-label="en" data-off-label="فارسی" style="display: none"
+             data-text-label="<span style='padding:0' class='glyphicon glyphicon-comment'></span>">
             <input type="checkbox" checked>
         </div>
     </header>
 
     <section>
-        <h3>Latest</h3>
+        <h3 lang="en">Latest</h3>
         <p>
             <ul>
-                <li><i>[Aug 15]</i> <a href="#">Android Feature Location</a></li>
+                <li><i lang="en">[Aug 15]</i> <a href="#" lang="en">Android Feature Location</a></li>
             </ul>
         </p>
         <br/><br/>
 
-        <h3>Find me on:</h3>
-        <div id="accounts-div">
-            <div class="icon" id="ico-github" title="github"></div>
+        <h3 lang="en">Find me on:</h3>
+        <div id="accounts-div" class="well">
+            <a id="ico-gmail" title="Gmail" href="#" target="_blank"></a>
+            <a id="ico-arsh" title="Arsh" href="#" target="_blank"></a>
+            <a id="ico-github" title="GitHub" href="https://github.com/amiraliakbari" target="_blank"></a>
+            <a id="ico-stack-overflow" title="Stack Overflow" href="http://stackoverflow.com/users/462865/amir-ali-akbari" target="_blank"></a>
+            <a id="ico-ask-ubuntu" title="Ask Ubuntu" href="http://askubuntu.com/users/79344/amir-ali-akbari" target="_blank"></a>
+            <a id="ico-phone" title="+98915-102-2395" href="#"></a>
+            <a id="ico-twitter" title="Twitter" href="https://twitter.com/amiraliakbari" target="_blank"></a>
         </div>
     </section>
 </div>
