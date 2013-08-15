@@ -1,0 +1,5 @@
+name: AmirAli Akbari
+markdown: redcarpet
+pygments: true
+timezone: Asia/Tehran
+permalink: /blog/:year/:title
