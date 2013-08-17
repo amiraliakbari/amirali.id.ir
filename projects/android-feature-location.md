@@ -9,7 +9,7 @@ translations: "fa"
 Feature Location is a technique for finding a specific part of code (e.g. the code for the spell checker in a
 word processor), called a feature, in a large codebase using automated algorithms and tools. If implemented
 and used effectively, feature location can facilitate software development a lot, specially when programmers
-are asked to maintain or make changes in a code they did not wrote themselves.
+are asked to maintain or make changes to a code they did not wrote themselves.
 
 
 ### My Project
@@ -37,7 +37,7 @@ rest of the page.
 Having a project-level parser made it very easy to generate some insightful reports about large projects.
 Having better vision of the overall project code structure is very near to the purpose of feature location,
 so I tried creating an automatic line-of-code (LOC) analyzer using my project parser. Below, you can see
-results  of LOC analyses I have made using iy for a few sample project. Thanks to superb [d3.js][2] library,
+results  of LOC analyses I have made using it for a few sample project. Thanks to superb [d3.js][2] library,
 the reports are fully interactive - try clicking on segments! The initial code for the reports are by
 [Andereas Dewes][4].
 
@@ -57,8 +57,8 @@ Also these sample projects are kindly provided by [Arsh (Amid Rayaneh Sharif)][3
 
 For the sake of completeness, I must mention that the reports show line-of-code distribution among project's
 sub-folders, and will give some very useful insight into the overall project structure and code organization.
-For better results, some justifications have been done on reporting LOC for specific files (like minified
-downloaded libraries, data dumps, etc.) to make results more usable, however, there are still some inevitable
+For better results, some justifications have been done on reporting LOC for specific files (like downloaded
+minified libraries, data dumps, etc.) to make results more usable, however, there are still some inevitable
 noises. Anyway, I hope you enjoy viewing and analysing the results as much as I enjoyed creating them!
 
 

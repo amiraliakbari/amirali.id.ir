@@ -431,3 +431,16 @@ footer p {
 #lang-select label, #lang-select label span {
     cursor: default;
 }
+
+#menu-home {
+    font-size: 28px;
+    left: 30px;
+    position: absolute;
+    top: 60px;
+    color: #006699;
+}
+
+#menu-home:hover {
+    top: 50px;
+    cursor: pointer;
+}
