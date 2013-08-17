@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Code Analysis of "github-android" Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding: 10px 0 30px;
+            font-family: Century Gothic, Arial, Helvetica, sans-serif;
+        }
+
+        #code_hierarchy_legend {
+            height: 80px;
+            text-align: center;
+        }
+
+        #code_hierarchy {}
+
+        #chart {
+            width: 600px;
+            height: 600px;
+            margin: 0 auto;
+        }
+    </style>
+    <link href="http://www.andreas-dewes.de/code_is_beautiful/flask_files/bootstrap-responsive.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.min.js"></script>
+    <script lang="text/javascript">
+
+    function init_code_hierarchy_plot(element_id, data) {
+        var plot = document.getElementById(element_id);
+
+        while (plot.hasChildNodes()) {
+            plot.removeChild(plot.firstChild);
+        }
+
+        var width = plot.offsetWidth;
+        var height = width;
+        var name_index = 0;
+        var count_index = 1;
+        var children_index = 3;
+
+        var max_depth = 3;
+
+        var data_slices = [];
+        var max_level = 6;
+        var color = d3.scale.category20c();
+
+        var svg = d3.select("#" + element_id).append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        function process_data(data, level, start_deg, stop_deg) {
+            var name = data[0];
+            var total = data[1];
+            var children = data[3];
+            var current_deg = start_deg;
+            if (level > max_level) {
+                return;
+            }
+            if (start_deg == stop_deg) {
+                return;
+            }
+            data_slices.push([start_deg, stop_deg, name, level, data[1], data[2]]);
+            for (var key in children) {
+                child = children[key];
+                var inc_deg = (stop_deg - start_deg) / total * child[count_index];
+                var child_start_deg = current_deg;
+                current_deg += inc_deg;
+                var child_stop_deg = current_deg;
+                var span_deg = child_stop_deg - child_start_deg;
+                process_data(child, level + 1, child_start_deg, child_stop_deg);
+            }
+        }
+
+        process_data(data, 0, 0, 360. / 180.0 * Math.PI);
+
+        var ref = data_slices[0];
+        var next_ref = ref;
+        var last_refs = [];
+
+        var thickness = width / 2.0 / (max_level + 2) * 1.1;
+
+        var arc = d3.svg.arc()
+                .startAngle(function (d) {
+                    if (d[3] == 0) {
+                        return d[0];
+                    }
+                    return d[0] + 0.01;
+                })
+                .endAngle(function (d) {
+                    if (d[3] == 0) {
+                        return d[1];
+                    }
+                    return d[1] - 0.01;
+                })
+                .innerRadius(function (d) {
+                    return 1.1 * d[3] * thickness;
+                })
+                .outerRadius(function (d) {
+                    return (1.1 * d[3] + 1) * thickness;
+                });
+
+        var slices = svg.selectAll(".form")
+                .data(function (d) {
+                    return data_slices;
+                })
+                .enter()
+                .append("g");
+        slices.append("path")
+                .attr("d", arc)
+                .attr("id", function (d, i) {
+                    return element_id + i;
+                })
+                .style("fill", function (d) {
+                    return color(d[2]);
+                })
+                .on("click", animate)
+                .on("mouseover", update_legend)
+                .on("mouseout", remove_legend)
+                .attr("class", "form")
+                .append("svg:title")
+                .text(function (d) {
+                    return d[2] + "," + d[3];
+                });
+
+        /*    slices.append("text")
+         .style("font-size", "10px")
+         .append("textPath")
+         .attr("xlink:href",function(d,i){return "#"+element_id+i;})
+         .text(function(d){return d[2]})
+         .attr("pointer-events","none")*/
+
+        var legend = d3.select("#" + element_id + "_legend")
+
+        function update_legend(d) {
+            legend.html("<h2>" + d[2] + "&nbsp;</h2><p>" + d[4] + " characters, " + d[5] + " lines of code.</p>");
+            legend.transition().duration(200).style("opacity", "1");
+        }
+
+        function remove_legend(d) {
+            legend.transition().duration(1000).style("opacity", "0");
+    //        legend.html("<h2>&nbsp;</h2>")
+        }
+
+        function get_start_angle(d, ref) {
+            if (ref) {
+                var ref_span = ref[1] - ref[0];
+                return (d[0] - ref[0]) / ref_span * Math.PI * 2.0
+            }
+            else {
+                return d[0];
+            }
+        }
+
+        function get_stop_angle(d, ref) {
+            if (ref) {
+                var ref_span = ref[1] - ref[0];
+                return (d[1] - ref[0]) / ref_span * Math.PI * 2.0
+            }
+            else {
+                return d[0];
+            }
+        }
+
+        function get_level(d, ref) {
+            if (ref) {
+                return d[3] - ref[3];
+            }
+            else {
+                return d[3];
+            }
+        }
+
+        function rebaseTween(new_ref) {
+            return function (d) {
+                var level = d3.interpolate(get_level(d, ref), get_level(d, new_ref));
+                var start_deg = d3.interpolate(get_start_angle(d, ref), get_start_angle(d, new_ref));
+                var stop_deg = d3.interpolate(get_stop_angle(d, ref), get_stop_angle(d, new_ref));
+                var opacity = d3.interpolate(100, 0);
+                return function (t) {
+                    return arc([start_deg(t), stop_deg(t), d[2], level(t)]);
+                }
+            }
+        }
+
+        var animating = false;
+
+        function animate(d) {
+            if (animating) {
+                return;
+            }
+            animating = true;
+            var revert = false;
+            var new_ref;
+            if (d == ref && last_refs.length > 0) {
+                revert = true;
+                last_ref = last_refs.pop();
+            }
+            if (revert) {
+                d = last_ref;
+                new_ref = ref;
+                svg.selectAll(".form")
+                        .filter(
+                        function (b) {
+                            if (b[0] >= last_ref[0] && b[1] <= last_ref[1] && b[3] >= last_ref[3]) {
+                                return true;
+                            }
+                            return false;
+                        }
+                )
+                        .transition().duration(1000).style("opacity", "1").attr("pointer-events", "all");
+            }
+            else {
+                new_ref = d;
+                svg.selectAll(".form")
+                        .filter(
+                        function (b) {
+                            if (b[0] < d[0] || b[1] > d[1] || b[3] < d[3]) {
+                                return true;
+                            }
+                            return false;
+                        }
+                )
+                        .transition().duration(1000).style("opacity", "0").attr("pointer-events", "none");
+            }
+            svg.selectAll(".form")
+                    .filter(
+                    function (b) {
+                        if (b[0] >= new_ref[0] && b[1] <= new_ref[1] && b[3] >= new_ref[3]) {
+                            return true;
+                        }
+                        return false;
+                    }
+            )
+                    .transition().duration(1000).attrTween("d", rebaseTween(d));
+            setTimeout(function () {
+                animating = false;
+                if (!revert) {
+                    last_refs.push(ref);
+                    ref = d;
+                }
+                else {
+                    ref = d;
+                }
+            }, 1000);
+        };
+
+    }
+
+    function init_plots() {
+        init_code_hierarchy_plot("code_hierarchy", code_hierarchy_data);
+    }
+
+    code_hierarchy_data = ["Project: github-android", 2208266, 61815, {
+    "default-properties": ["default.properties", 138, 5, {}],
+    "app": ["app", 2075305, 58258, {
+        "src": ["src", 984607, 31604, {
+            "main.java.com.github.mobile": ["main.java.com.github.mobile", 984607, 31604, {
+                "core": ["core", 141198, 4823, {
+                    "repo": ["repo", 16512, 531, {
+                        "RepositoryUtils-java": ["RepositoryUtils.java", 3243, 89, {}],
+                        "RepositoryUriMatcher-java": ["RepositoryUriMatcher.java", 1765, 58, {}],
+                        "UnstarRepositoryTask-java": ["UnstarRepositoryTask.java", 2117, 78, {}],
+                        "StarredRepositoryTask-java": ["StarredRepositoryTask.java", 1853, 64, {}],
+                        "StarRepositoryTask-java": ["StarRepositoryTask.java", 2103, 78, {}],
+                        "RepositoryEventMatcher-java": ["RepositoryEventMatcher.java", 3558, 100, {}],
+                        "RefreshRepositoryTask-java": ["RefreshRepositoryTask.java", 1873, 64, {}]
+                    }],
+                    "search": ["search", 8189, 323, {
+                        "SearchUserService-java": ["SearchUserService.java", 4803, 148, {}],
+                        "SearchUser-java": ["SearchUser.java", 3386, 175, {}]
+                    }],
+                    "code": ["code", 11094, 364, {
+                        "RefreshBlobTask-java": ["RefreshBlobTask.java", 1635, 58, {}],
+                        "FullTree-java": ["FullTree.java", 5702, 192, {}],
+                        "RefreshTreeTask-java": ["RefreshTreeTask.java", 3757, 114, {}]
+                    }],
+                    "gist": ["gist", 16952, 612, {
+                        "GistUriMatcher-java": ["GistUriMatcher.java", 1707, 59, {}],
+                        "StarGistTask-java": ["StarGistTask.java", 1736, 65, {}],
+                        "RefreshGistTask-java": ["RefreshGistTask.java", 2665, 89, {}],
+                        "GistEventMatcher-java": ["GistEventMatcher.java", 1541, 49, {}],
+                        "GistStore-java": ["GistStore.java", 3102, 118, {}],
+                        "GistUrlMatcher-java": ["GistUrlMatcher.java", 1417, 46, {}],
+                        "FullGist-java": ["FullGist.java", 1792, 73, {}],
+                        "UnstarGistTask-java": ["UnstarGistTask.java", 1750, 65, {}],
+                        "GistPager-java": ["GistPager.java", 1242, 48, {}]
+                    }],
+                    "OnLoadListener-java": ["OnLoadListener.java", 825, 32, {}],
+                    "issue": ["issue", 30468, 967, {
+                        "IssueFilter-java": ["IssueFilter.java", 9062, 302, {}],
+                        "IssueStore-java": ["IssueStore.java", 6725, 193, {}],
+                        "RefreshIssueTask-java": ["RefreshIssueTask.java", 3253, 101, {}],
+                        "FullIssue-java": ["FullIssue.java", 1534, 60, {}],
+                        "IssueEventMatcher-java": ["IssueEventMatcher.java", 2099, 58, {}],
+                        "IssueUrlMatcher-java": ["IssueUrlMatcher.java", 1584, 53, {}],
+                        "IssueUriMatcher-java": ["IssueUriMatcher.java", 2423, 79, {}],
+                        "IssuePager-java": ["IssuePager.java", 1355, 51, {}],
+                        "IssueUtils-java": ["IssueUtils.java", 2433, 70, {}]
+                    }],
+                    "ItemStore-java": ["ItemStore.java", 2586, 95, {}],
+                    "UrlMatcher-java": ["UrlMatcher.java", 1245, 41, {}],
+                    "ResourcePager-java": ["ResourcePager.java", 4566, 175, {}],
+                    "user": ["user", 15440, 554, {
+                        "UnfollowUserTask-java": ["UnfollowUserTask.java", 2063, 78, {}],
+                        "FollowUserTask-java": ["FollowUserTask.java", 2049, 78, {}],
+                        "UserEventMatcher-java": ["UserEventMatcher.java", 2128, 76, {}],
+                        "UserUrlMatcher-java": ["UserUrlMatcher.java", 1594, 54, {}],
+                        "RefreshUserTask-java": ["RefreshUserTask.java", 1729, 63, {}],
+                        "UserUriMatcher-java": ["UserUriMatcher.java", 1445, 51, {}],
+                        "UserPager-java": ["UserPager.java", 940, 32, {}],
+                        "FollowingUserTask-java": ["FollowingUserTask.java", 1755, 63, {}],
+                        "UserComparator-java": ["UserComparator.java", 1737, 59, {}]
+                    }],
+                    "commit": ["commit", 29587, 996, {
+                        "CommitPager-java": ["CommitPager.java", 1574, 54, {}],
+                        "CommitUtils-java": ["CommitUtils.java", 8110, 285, {}],
+                        "FullCommitFile-java": ["FullCommitFile.java", 2262, 84, {}],
+                        "FullCommit-java": ["FullCommit.java", 4155, 131, {}],
+                        "CommitCompareTask-java": ["CommitCompareTask.java", 2107, 73, {}],
+                        "CommitMatch-java": ["CommitMatch.java", 1197, 46, {}],
+                        "RefreshCommitTask-java": ["RefreshCommitTask.java", 3016, 94, {}],
+                        "CommitUriMatcher-java": ["CommitUriMatcher.java", 2036, 66, {}],
+                        "CommitStore-java": ["CommitStore.java", 3344, 105, {}],
+                        "CommitUrlMatcher-java": ["CommitUrlMatcher.java", 1786, 58, {}]
+                    }],
+                    "ref": ["ref", 3734, 133, {
+                        "RefUtils-java": ["RefUtils.java", 3734, 133, {}]
+                    }]
+                }],
+                "ui": ["ui", 644530, 20280, {
+                    "comment": ["comment", 15027, 507, {
+                        "RawCommentFragment-java": ["RawCommentFragment.java", 2131, 69, {}],
+                        "CommentListAdapter-java": ["CommentListAdapter.java", 2929, 97, {}],
+                        "RenderedCommentFragment-java": ["RenderedCommentFragment.java", 3773, 116, {}],
+                        "CommentPreviewPagerAdapter-java": ["CommentPreviewPagerAdapter.java", 2338, 86, {}],
+                        "CreateCommentActivity-java": ["CreateCommentActivity.java", 3856, 139, {}]
+                    }],
+                    "code": ["code", 11113, 325, {
+                        "RepositoryCodeFragment-java": ["RepositoryCodeFragment.java", 11113, 325, {}]
+                    }],
+                    "ProgressDialogTask-java": ["ProgressDialogTask.java", 2924, 114, {}],
+                    "DialogResultListener-java": ["DialogResultListener.java", 1168, 37, {}],
+                    "StyledText-java": ["StyledText.java", 5236, 190, {}],
+                    "LightProgressDialog-java": ["LightProgressDialog.java", 2871, 85, {}],
+                    "gist": ["gist", 71715, 2306, {
+                        "PublicGistsFragment-java": ["PublicGistsFragment.java", 1264, 40, {}],
+                        "DeleteGistTask-java": ["DeleteGistTask.java", 2400, 89, {}],
+                        "CreateGistActivity-java": ["CreateGistActivity.java", 5001, 151, {}],
+                        "GistsFragment-java": ["GistsFragment.java", 3312, 115, {}],
+                        "CreateCommentActivity-java": ["CreateCommentActivity.java", 2339, 78, {}],
+                        "CreateCommentTask-java": ["CreateCommentTask.java", 2508, 89, {}],
+                        "GistFilesViewActivity-java": ["GistFilesViewActivity.java", 5406, 171, {}],
+                        "GistsViewActivity-java": ["GistsViewActivity.java", 7109, 212, {}],
+                        "GistFragment-java": ["GistFragment.java", 14066, 429, {}],
+                        "RandomGistTask-java": ["RandomGistTask.java", 3181, 105, {}],
+                        "GistsActivity-java": ["GistsActivity.java", 3187, 99, {}],
+                        "MyGistsFragment-java": ["MyGistsFragment.java", 2045, 63, {}],
+                        "GistListAdapter-java": ["GistListAdapter.java", 3318, 108, {}],
+                        "StarredGistsFragment-java": ["StarredGistsFragment.java", 1259, 40, {}],
+                        "CreateGistTask-java": ["CreateGistTask.java", 2786, 100, {}],
+                        "GistsPagerAdapter-java": ["GistsPagerAdapter.java", 1622, 56, {}],
+                        "GistQueriesPagerAdapter-java": ["GistQueriesPagerAdapter.java", 2083, 76, {}],
+                        "GistFilesPagerAdapter-java": ["GistFilesPagerAdapter.java", 2137, 71, {}],
+                        "GistFileFragment-java": ["GistFileFragment.java", 6692, 214, {}]
+                    }],
+                    "TextWatcherAdapter-java": ["TextWatcherAdapter.java", 1081, 36, {}],
+                    "DialogFragmentHelper-java": ["DialogFragmentHelper.java", 4046, 144, {}],
+                    "FragmentPagerAdapter-java": ["FragmentPagerAdapter.java", 1943, 65, {}],
+                    "ItemListFragment-java": ["ItemListFragment.java", 13108, 464, {}],
+                    "HeaderFooterListAdapter-java": ["HeaderFooterListAdapter.java", 5187, 187, {}],
+                    "FragmentStatePagerAdapter-java": ["FragmentStatePagerAdapter.java", 1959, 66, {}],
+                    "SingleChoiceDialogFragment-java": ["SingleChoiceDialogFragment.java", 2150, 70, {}],
+                    "ref": ["ref", 25451, 799, {
+                        "BranchFileViewActivity-java": ["BranchFileViewActivity.java", 10271, 305, {}],
+                        "RefDialogFragment-java": ["RefDialogFragment.java", 5508, 171, {}],
+                        "RefDialog-java": ["RefDialog.java", 4521, 142, {}],
+                        "CodeTreeAdapter-java": ["CodeTreeAdapter.java", 5151, 181, {}]
+                    }],
+                    "NewsFragment-java": ["NewsFragment.java", 10555, 312, {}],
+                    "FragmentProvider-java": ["FragmentProvider.java", 888, 32, {}],
+                    "ConfirmDialogFragment-java": ["ConfirmDialogFragment.java", 3172, 93, {}],
+                    "MarkdownLoader-java": ["MarkdownLoader.java", 2650, 92, {}],
+                    "ResourceLoadingIndicator-java": ["ResourceLoadingIndicator.java", 2456, 84, {}],
+                    "DialogFragment-java": ["DialogFragment.java", 2593, 89, {}],
+                    "TabPagerActivity-java": ["TabPagerActivity.java", 6498, 224, {}],
+                    "repo": ["repo", 57033, 1827, {
+                        "RepositoryListAdapter-java": ["RepositoryListAdapter.java", 2880, 93, {}],
+                        "UserRepositoryListFragment-java": ["UserRepositoryListFragment.java", 3613, 113, {}],
+                        "DefaultRepositoryListAdapter-java": ["DefaultRepositoryListAdapter.java", 4451, 142, {}],
+                        "ContributorListAdapter-java": ["ContributorListAdapter.java", 2130, 71, {}],
+                        "UserRepositoryListAdapter-java": ["UserRepositoryListAdapter.java", 2992, 92, {}],
+                        "OrganizationLoader-java": ["OrganizationLoader.java", 2624, 83, {}],
+                        "RepositoryPagerAdapter-java": ["RepositoryPagerAdapter.java", 3883, 133, {}],
+                        "RepositoryListFragment-java": ["RepositoryListFragment.java", 10276, 309, {}],
+                        "RecentRepositories-java": ["RecentRepositories.java", 5570, 209, {}],
+                        "RepositoryContributorsActivity-java": ["RepositoryContributorsActivity.java", 2778, 86, {}],
+                        "RepositoryContributorsFragment-java": ["RepositoryContributorsFragment.java", 3458, 112, {}],
+                        "RepositoryViewActivity-java": ["RepositoryViewActivity.java", 9601, 294, {}],
+                        "RepositoryNewsFragment-java": ["RepositoryNewsFragment.java", 2777, 90, {}]
+                    }],
+                    "user": ["user", 83706, 2559, {
+                        "UserPagerAdapter-java": ["UserPagerAdapter.java", 2281, 79, {}],
+                        "UserListAdapter-java": ["UserListAdapter.java", 1842, 65, {}],
+                        "NewsListAdapter-java": ["NewsListAdapter.java", 22246, 609, {}],
+                        "UserFollowingFragment-java": ["UserFollowingFragment.java", 1570, 52, {}],
+                        "EventPager-java": ["EventPager.java", 1090, 37, {}],
+                        "HomeActivity-java": ["HomeActivity.java", 10610, 305, {}],
+                        "UriLauncherActivity-java": ["UriLauncherActivity.java", 4940, 133, {}],
+                        "UserFollowersFragment-java": ["UserFollowersFragment.java", 1546, 52, {}],
+                        "FollowingFragment-java": ["FollowingFragment.java", 1262, 44, {}],
+                        "OrganizationSelectionListener-java": ["OrganizationSelectionListener.java", 961, 31, {}],
+                        "MyFollowersFragment-java": ["MyFollowersFragment.java", 1256, 39, {}],
+                        "UserReceivedNewsFragment-java": ["UserReceivedNewsFragment.java", 1278, 40, {}],
+                        "UserNewsFragment-java": ["UserNewsFragment.java", 3017, 97, {}],
+                        "HomePagerAdapter-java": ["HomePagerAdapter.java", 4076, 135, {}],
+                        "HomeDropdownListAdapter-java": ["HomeDropdownListAdapter.java", 5709, 206, {}],
+                        "OrganizationSelectionProvider-java": ["OrganizationSelectionProvider.java", 1263, 42, {}],
+                        "MembersFragment-java": ["MembersFragment.java", 3801, 116, {}],
+                        "UserCreatedNewsFragment-java": ["UserCreatedNewsFragment.java", 1269, 40, {}],
+                        "FollowersFragment-java": ["FollowersFragment.java", 1260, 44, {}],
+                        "OrganizationNewsFragment-java": ["OrganizationNewsFragment.java", 1403, 42, {}],
+                        "PagedUserFragment-java": ["PagedUserFragment.java", 1923, 63, {}],
+                        "UserViewActivity-java": ["UserViewActivity.java", 7820, 248, {}],
+                        "MyFollowingFragment-java": ["MyFollowingFragment.java", 1283, 40, {}]
+                    }],
+                    "WebView-java": ["WebView.java", 2464, 84, {}],
+                    "search": ["search", 21432, 704, {
+                        "SearchUserListAdapter-java": ["SearchUserListAdapter.java", 1929, 66, {}],
+                        "SearchPagerAdapter-java": ["SearchPagerAdapter.java", 1948, 72, {}],
+                        "SearchActivity-java": ["SearchActivity.java", 4905, 155, {}],
+                        "SearchUserListFragment-java": ["SearchUserListFragment.java", 3347, 112, {}],
+                        "SearchRepositoryListAdapter-java": ["SearchRepositoryListAdapter.java", 2688, 83, {}],
+                        "RepositorySearchSuggestionsProvider-java": ["RepositorySearchSuggestionsProvider.java", 1814, 60, {}],
+                        "SearchRepositoryListFragment-java": ["SearchRepositoryListFragment.java", 4801, 156, {}]
+                    }],
+                    "ViewPager-java": ["ViewPager.java", 3525, 120, {}],
+                    "issue": ["issue", 181661, 5536, {
+                        "FilterListFragment-java": ["FilterListFragment.java", 2882, 90, {}],
+                        "IssueDashboardActivity-java": ["IssueDashboardActivity.java", 2842, 86, {}],
+                        "EditIssuesFilterActivity-java": ["EditIssuesFilterActivity.java", 9245, 281, {}],
+                        "EditAssigneeTask-java": ["EditAssigneeTask.java", 3077, 107, {}],
+                        "CreateCommentActivity-java": ["CreateCommentActivity.java", 3179, 94, {}],
+                        "MilestoneDialogFragment-java": ["MilestoneDialogFragment.java", 5716, 173, {}],
+                        "IssuesPagerAdapter-java": ["IssuesPagerAdapter.java", 4900, 148, {}],
+                        "FilterListAdapter-java": ["FilterListAdapter.java", 3191, 95, {}],
+                        "DashboardIssueFragment-java": ["DashboardIssueFragment.java", 3913, 127, {}],
+                        "RepositoryIssueListAdapter-java": ["RepositoryIssueListAdapter.java", 2831, 89, {}],
+                        "IssueBrowseActivity-java": ["IssueBrowseActivity.java", 2880, 85, {}],
+                        "IssueSearchActivity-java": ["IssueSearchActivity.java", 4192, 122, {}],
+                        "SearchIssueListAdapter-java": ["SearchIssueListAdapter.java", 3128, 97, {}],
+                        "MilestoneDialog-java": ["MilestoneDialog.java", 5409, 165, {}],
+                        "IssueFragment-java": ["IssueFragment.java", 20790, 605, {}],
+                        "EditMilestoneTask-java": ["EditMilestoneTask.java", 3154, 108, {}],
+                        "LabelDrawableSpan-java": ["LabelDrawableSpan.java", 8586, 258, {}],
+                        "EditLabelsTask-java": ["EditLabelsTask.java", 3034, 108, {}],
+                        "DashboardIssueListAdapter-java": ["DashboardIssueListAdapter.java", 3237, 101, {}],
+                        "FiltersViewActivity-java": ["FiltersViewActivity.java", 4390, 124, {}],
+                        "CreateIssueTask-java": ["CreateIssueTask.java", 2469, 89, {}],
+                        "IssuesFragment-java": ["IssuesFragment.java", 9684, 287, {}],
+                        "LabelsDialogFragment-java": ["LabelsDialogFragment.java", 7040, 197, {}],
+                        "CreateCommentTask-java": ["CreateCommentTask.java", 2866, 98, {}],
+                        "IssueDashboardPagerAdapter-java": ["IssueDashboardPagerAdapter.java", 3763, 109, {}],
+                        "IssuesViewActivity-java": ["IssuesViewActivity.java", 10747, 316, {}],
+                        "AssigneeDialogFragment-java": ["AssigneeDialogFragment.java", 5537, 170, {}],
+                        "EditIssueActivity-java": ["EditIssueActivity.java", 12691, 370, {}],
+                        "EditStateTask-java": ["EditStateTask.java", 3446, 112, {}],
+                        "IssueListAdapter-java": ["IssueListAdapter.java", 5110, 167, {}],
+                        "LabelsDialog-java": ["LabelsDialog.java", 4858, 151, {}],
+                        "AssigneeDialog-java": ["AssigneeDialog.java", 4667, 146, {}],
+                        "SearchIssueListFragment-java": ["SearchIssueListFragment.java", 4358, 128, {}],
+                        "EditIssueTask-java": ["EditIssueTask.java", 1996, 73, {}],
+                        "IssueSearchSuggestionsProvider-java": ["IssueSearchSuggestionsProvider.java", 1853, 60, {}]
+                    }],
+                    "LightAlertDialog-java": ["LightAlertDialog.java", 2263, 76, {}],
+                    "PagerActivity-java": ["PagerActivity.java", 2748, 95, {}],
+                    "UrlLauncher-java": ["UrlLauncher.java", 5984, 175, {}],
+                    "BaseActivity-java": ["BaseActivity.java", 2154, 83, {}],
+                    "commit": ["commit", 80513, 2429, {
+                        "CommitListFragment-java": ["CommitListFragment.java", 9302, 284, {}],
+                        "DiffStyler-java": ["DiffStyler.java", 4153, 138, {}],
+                        "CommitViewActivity-java": ["CommitViewActivity.java", 5064, 159, {}],
+                        "CreateCommentTask-java": ["CreateCommentTask.java", 2802, 95, {}],
+                        "CommitFileListAdapter-java": ["CommitFileListAdapter.java", 6984, 215, {}],
+                        "CreateCommentActivity-java": ["CreateCommentActivity.java", 4007, 122, {}],
+                        "CommitCompareListFragment-java": ["CommitCompareListFragment.java", 9664, 276, {}],
+                        "CommitDiffListFragment-java": ["CommitDiffListFragment.java", 17886, 516, {}],
+                        "CommitPagerAdapter-java": ["CommitPagerAdapter.java", 1966, 65, {}],
+                        "CommitListAdapter-java": ["CommitListAdapter.java", 2924, 94, {}],
+                        "CommitFileViewActivity-java": ["CommitFileViewActivity.java", 10655, 312, {}],
+                        "CommitFileComparator-java": ["CommitFileComparator.java", 1408, 44, {}],
+                        "CommitCompareViewActivity-java": ["CommitCompareViewActivity.java", 3698, 109, {}]
+                    }],
+                    "DialogFragmentActivity-java": ["DialogFragmentActivity.java", 3217, 122, {}],
+                    "PagedItemFragment-java": ["PagedItemFragment.java", 4039, 149, {}]
+                }],
+                "RequestFuture-java": ["RequestFuture.java", 936, 33, {}],
+                "Intents-java": ["Intents.java", 9594, 352, {}],
+                "sync": ["sync", 8732, 308, {
+                    "SyncCampaign-java": ["SyncCampaign.java", 3463, 121, {}],
+                    "SyncAdapterService-java": ["SyncAdapterService.java", 1142, 38, {}],
+                    "ContentProviderAdapter-java": ["ContentProviderAdapter.java", 1619, 60, {}],
+                    "SyncAdapter-java": ["SyncAdapter.java", 2508, 89, {}]
+                }],
+                "RequestCodes-java": ["RequestCodes.java", 2001, 98, {}],
+                "util": ["util", 75631, 2528, {
+                    "TimeUtils-java": ["TimeUtils.java", 1589, 47, {}],
+                    "AvatarLoader-java": ["AvatarLoader.java", 13941, 463, {}],
+                    "HtmlUtils-java": ["HtmlUtils.java", 17294, 511, {}],
+                    "PreferenceUtils-java": ["PreferenceUtils.java", 1910, 66, {}],
+                    "ServiceUtils-java": ["ServiceUtils.java", 3478, 132, {}],
+                    "ImageUtils-java": ["ImageUtils.java", 7684, 258, {}],
+                    "TypefaceUtils-java": ["TypefaceUtils.java", 5728, 243, {}],
+                    "ShareUtils-java": ["ShareUtils.java", 1933, 66, {}],
+                    "HttpImageGetter-java": ["HttpImageGetter.java", 10085, 301, {}],
+                    "SourceEditor-java": ["SourceEditor.java", 5462, 211, {}],
+                    "MarkdownUtils-java": ["MarkdownUtils.java", 1410, 47, {}],
+                    "GravatarUtils-java": ["GravatarUtils.java", 2643, 96, {}],
+                    "ToastUtils-java": ["ToastUtils.java", 2474, 87, {}]
+                }],
+                "DefaultClient-java": ["DefaultClient.java", 1683, 60, {}],
+                "ThrowableLoader-java": ["ThrowableLoader.java", 2578, 100, {}],
+                "accounts": ["accounts", 54976, 1655, {
+                    "AccountConstants-java": ["AccountConstants.java", 1187, 48, {}],
+                    "AuthenticatedUserLoader-java": ["AuthenticatedUserLoader.java", 2729, 102, {}],
+                    "LoginActivity-java": ["LoginActivity.java", 15213, 436, {}],
+                    "AccountUtils-java": ["AccountUtils.java", 12600, 355, {}],
+                    "GitHubAccount-java": ["GitHubAccount.java", 2616, 96, {}],
+                    "AccountAuthenticatorService-java": ["AccountAuthenticatorService.java", 1416, 41, {}],
+                    "ScopeBase-java": ["ScopeBase.java", 2219, 70, {}],
+                    "AccountClient-java": ["AccountClient.java", 2073, 67, {}],
+                    "AccountScope-java": ["AccountScope.java", 3531, 111, {}],
+                    "AccountAuthenticator-java": ["AccountAuthenticator.java", 8332, 224, {}],
+                    "AuthenticatedUserTask-java": ["AuthenticatedUserTask.java", 3060, 105, {}]
+                }],
+                "RequestReader-java": ["RequestReader.java", 3352, 109, {}],
+                "GitHubModule-java": ["GitHubModule.java", 3532, 105, {}],
+                "RequestWriter-java": ["RequestWriter.java", 2961, 99, {}],
+                "ResultCodes-java": ["ResultCodes.java", 866, 30, {}],
+                "persistence": ["persistence", 28023, 888, {
+                    "PersistableResource-java": ["PersistableResource.java", 1792, 63, {}],
+                    "OrganizationRepositories-java": ["OrganizationRepositories.java", 6670, 192, {}],
+                    "DatabaseCache-java": ["DatabaseCache.java", 4878, 160, {}],
+                    "Organizations-java": ["Organizations.java", 3223, 102, {}],
+                    "CacheHelper-java": ["CacheHelper.java", 2151, 63, {}],
+                    "AccountDataManager-java": ["AccountDataManager.java", 9309, 308, {}]
+                }],
+                "ServicesModule-java": ["ServicesModule.java", 4014, 136, {}]
+            }]
+        }],
+        "-project": [".project", 853, 34, {}],
+        "assets": ["assets", 556292, 15254, {
+            "source-editor-css": ["source-editor.css", 365, 25, {}],
+            "VERSION-code-mirror": ["VERSION-code-mirror", 5, 1, {}],
+            "LICENSE": ["LICENSE", 1251, 24, {}],
+            "octicons-regular-webfont-ttf": ["octicons-regular-webfont.ttf", 51, 51, {}],
+            "trans_bg-gif": ["trans_bg.gif", 0, 0, {}],
+            "lib": ["lib", 142520, 3453, {
+                "util": ["util", 4083, 112, {
+                    "loadmode-js": ["loadmode.js", 1838, 52, {}],
+                    "overlay-js": ["overlay.js", 2245, 60, {}]
+                }],
+                "codemirror-js": ["codemirror.js", 133666, 3166, {}],
+                "codemirror-css": ["codemirror.css", 4771, 175, {}]
+            }],
+            "mode": ["mode", 407676, 11513, {
+                "vb": ["vb", 9671, 283, {
+                    "LICENSE-txt": ["LICENSE.txt", 1134, 22, {}],
+                    "vb-js": ["vb.js", 8537, 261, {}]
+                }],
+                "markdown": ["markdown", 14207, 482, {
+                    "markdown-js": ["markdown.js", 14207, 482, {}]
+                }],
+                "less": ["less", 1, 1, {
+                    "less-js": ["less.js", 1, 1, {}]
+                }],
+                "commonlisp": ["commonlisp", 3634, 102, {
+                    "commonlisp-js": ["commonlisp.js", 3634, 102, {}]
+                }],
+                "mysql": ["mysql", 7983, 187, {
+                    "mysql-js": ["mysql.js", 7983, 187, {}]
+                }],
+                "tiddlywiki": ["tiddlywiki", 10103, 400, {
+                    "tiddlywiki-css": ["tiddlywiki.css", 234, 15, {}],
+                    "tiddlywiki-js": ["tiddlywiki.js", 9869, 385, {}]
+                }],
+                "pig": ["pig", 5406, 173, {
+                    "pig-js": ["pig.js", 5406, 173, {}]
+                }],
+                "pascal": ["pascal", 3789, 103, {
+                    "pascal-js": ["pascal.js", 2704, 95, {}],
+                    "LICENSE": ["LICENSE", 1085, 8, {}]
+                }],
+                "haskell": ["haskell", 7722, 243, {
+                    "haskell-js": ["haskell.js", 7722, 243, {}]
+                }],
+                "gfm": ["gfm", 2936, 95, {
+                    "gfm-js": ["gfm.js", 2936, 95, {}]
+                }],
+                "go": ["go", 5647, 171, {
+                    "go-js": ["go.js", 5647, 171, {}]
+                }],
+                "diff": ["diff", 702, 33, {
+                    "diff-js": ["diff.js", 702, 33, {}]
+                }],
+                "rpm": ["rpm", 3709, 93, {
+                    "changes": ["changes", 673, 20, {
+                        "changes-js": ["changes.js", 673, 20, {}]
+                    }],
+                    "spec": ["spec", 3036, 73, {
+                        "spec-css": ["spec.css", 272, 6, {}],
+                        "spec-js": ["spec.js", 2764, 67, {}]
+                    }]
+                }],
+                "smalltalk": ["smalltalk", 3588, 139, {
+                    "smalltalk-js": ["smalltalk.js", 3588, 139, {}]
+                }],
+                "ntriples": ["ntriples", 6533, 173, {
+                    "ntriples-js": ["ntriples.js", 6533, 173, {}]
+                }],
+                "xml": ["xml", 10228, 319, {
+                    "xml-js": ["xml.js", 10228, 319, {}]
+                }],
+                "sieve": ["sieve", 4803, 181, {
+                    "LICENSE": ["LICENSE", 1249, 24, {}],
+                    "sieve-js": ["sieve.js", 3554, 157, {}]
+                }],
+                "yaml": ["yaml", 2772, 96, {
+                    "yaml-js": ["yaml.js", 2772, 96, {}]
+                }],
+                "vbscript": ["vbscript", 0, 0, {
+                    "vbscript-js": ["vbscript.js", 0, 0, {}]
+                }],
+                "perl": ["perl", 31358, 837, {
+                    "perl-js": ["perl.js", 30245, 817, {}],
+                    "LICENSE": ["LICENSE", 1113, 20, {}]
+                }],
+                "coffeescript": ["coffeescript", 12444, 369, {
+                    "coffeescript-js": ["coffeescript.js", 11272, 347, {}],
+                    "LICENSE": ["LICENSE", 1172, 22, {}]
+                }],
+                "verilog": ["verilog", 7001, 195, {
+                    "verilog-js": ["verilog.js", 7001, 195, {}]
+                }],
+                "haxe": ["haxe", 15621, 430, {
+                    "haxe-js": ["haxe.js", 15621, 430, {}]
+                }],
+                "scheme": ["scheme", 13194, 231, {
+                    "scheme-js": ["scheme.js", 13194, 231, {}]
+                }],
+                "css": ["css", 22067, 449, {
+                    "css-js": ["css.js", 22067, 449, {}]
+                }],
+                "htmlmixed": ["htmlmixed", 3065, 85, {
+                    "htmlmixed-js": ["htmlmixed.js", 3065, 85, {}]
+                }],
+                "shell": ["shell", 3330, 119, {
+                    "shell-js": ["shell.js", 3330, 119, {}]
+                }],
+                "plsql": ["plsql", 8649, 218, {
+                    "plsql-js": ["plsql.js", 8649, 218, {}]
+                }],
+                "python": ["python", 13579, 360, {
+                    "LICENSE-txt": ["LICENSE.txt", 1095, 21, {}],
+                    "python-js": ["python.js", 12484, 339, {}]
+                }],
+                "ecl": ["ecl", 8727, 204, {
+                    "ecl-js": ["ecl.js", 8727, 204, {}]
+                }],
+                "jinja2": ["jinja2", 1422, 43, {
+                    "jinja2-js": ["jinja2.js", 1422, 43, {}]
+                }],
+                "smarty": ["smarty", 4001, 148, {
+                    "smarty-js": ["smarty.js", 4001, 148, {}]
+                }],
+                "rst": ["rst", 8765, 327, {
+                    "rst-js": ["rst.js", 8765, 327, {}]
+                }],
+                "htmlembedded": ["htmlembedded", 2664, 74, {
+                    "htmlembedded-js": ["htmlembedded.js", 2664, 74, {}]
+                }],
+                "stex": ["stex", 4713, 183, {
+                    "stex-js": ["stex.js", 4713, 183, {}]
+                }],
+                "php": ["php", 6252, 149, {
+                    "php-js": ["php.js", 6252, 149, {}]
+                }],
+                "ruby": ["ruby", 9003, 221, {
+                    "ruby-js": ["ruby.js", 7492, 196, {}],
+                    "LICENSE": ["LICENSE", 1511, 25, {}]
+                }],
+                "properties": ["properties", 1797, 64, {
+                    "properties-js": ["properties.js", 1797, 64, {}]
+                }],
+                "groovy": ["groovy", 7369, 211, {
+                    "groovy-js": ["groovy.js", 7369, 211, {}]
+                }],
+                "erlang": ["erlang", 13767, 464, {
+                    "erlang-js": ["erlang.js", 13767, 464, {}]
+                }],
+                "sparql": ["sparql", 4748, 144, {
+                    "sparql-js": ["sparql.js", 4748, 144, {}]
+                }],
+                "clike": ["clike", 11101, 286, {
+                    "clike-js": ["clike.js", 11101, 286, {}]
+                }],
+                "ocaml": ["ocaml", 2836, 115, {
+                    "ocaml-js": ["ocaml.js", 2836, 115, {}]
+                }],
+                "tiki": ["tiki", 8596, 336, {
+                    "tiki-js": ["tiki.js", 8125, 310, {}],
+                    "tiki-css": ["tiki.css", 471, 26, {}]
+                }],
+                "xquery": ["xquery", 17607, 472, {
+                    "xquery-js": ["xquery.js", 16479, 452, {}],
+                    "LICENSE": ["LICENSE", 1128, 20, {}]
+                }],
+                "r": ["r", 6587, 167, {
+                    "r-js": ["r.js", 5077, 142, {}],
+                    "LICENSE": ["LICENSE", 1510, 25, {}]
+                }],
+                "javascript": ["javascript", 14807, 410, {
+                    "javascript-js": ["javascript.js", 14807, 410, {}]
+                }],
+                "velocity": ["velocity", 5106, 147, {
+                    "velocity-js": ["velocity.js", 5106, 147, {}]
+                }],
+                "clojure": ["clojure", 12671, 207, {
+                    "clojure-js": ["clojure.js", 12671, 207, {}]
+                }],
+                "lua": ["lua", 5506, 141, {
+                    "lua-js": ["lua.js", 5506, 141, {}]
+                }],
+                "rust": ["rust", 15889, 433, {
+                    "rust-js": ["rust.js", 15889, 433, {}]
+                }]
+            }],
+            "source-editor-html": ["source-editor.html", 375, 13, {}],
+            "source-editor-js": ["source-editor.js", 4049, 174, {}]
+        }],
+        "AndroidManifest-xml": ["AndroidManifest.xml", 14801, 364, {}],
+        "pom-xml": ["pom.xml", 6662, 207, {}],
+        "project-properties": ["project.properties", 240, 7, {}],
+        "-settings": [".settings", 28251, 364, {
+            "org-eclipse-jdt-core-prefs": ["org.eclipse.jdt.core.prefs", 25431, 306, {}],
+            "org-eclipse-jdt-ui-prefs": ["org.eclipse.jdt.ui.prefs", 2820, 58, {}]
+        }],
+        "res": ["res", 483223, 10414, {
+            "drawable-mdpi": ["drawable-mdpi", 33, 33, {
+                "menu_random-png": ["menu_random.png", 2, 2, {}],
+                "menu_bookmark-png": ["menu_bookmark.png", 1, 1, {}],
+                "menu_delete_history-png": ["menu_delete_history.png", 2, 2, {}],
+                "menu_issue_close-png": ["menu_issue_close.png", 2, 2, {}],
+                "menu_delete-png": ["menu_delete.png", 2, 2, {}],
+                "menu_share-png": ["menu_share.png", 1, 1, {}],
+                "action_create-png": ["action_create.png", 0, 0, {}],
+                "menu_filter-png": ["menu_filter.png", 1, 1, {}],
+                "menu_issue_reopen-png": ["menu_issue_reopen.png", 2, 2, {}],
+                "action_refresh-png": ["action_refresh.png", 0, 0, {}],
+                "action_dashboard-png": ["action_dashboard.png", 1, 1, {}],
+                "app_icon-png": ["app_icon.png", 4, 4, {}],
+                "action_search-png": ["action_search.png", 1, 1, {}],
+                "menu_star-png": ["menu_star.png", 2, 2, {}],
+                "action_bookmark-png": ["action_bookmark.png", 1, 1, {}],
+                "menu_refresh-png": ["menu_refresh.png", 2, 2, {}],
+                "menu_issue_open-png": ["menu_issue_open.png", 2, 2, {}],
+                "action_save-png": ["action_save.png", 3, 3, {}],
+                "action_comment-png": ["action_comment.png", 1, 1, {}],
+                "action_gist-png": ["action_gist.png", 1, 1, {}],
+                "menu_edit-png": ["menu_edit.png", 2, 2, {}]
+            }],
+            "values-es": ["values-es", 15131, 265, {
+                "strings-xml": ["strings.xml", 15131, 265, {}]
+            }],
+            "color": ["color", 1694, 44, {
+                "tab_icon_colors-xml": ["tab_icon_colors.xml", 847, 22, {}],
+                "tab_text_colors-xml": ["tab_text_colors.xml", 847, 22, {}]
+            }],
+            "drawable-hdpi": ["drawable-hdpi", 49, 49, {
+                "menu_random-png": ["menu_random.png", 3, 3, {}],
+                "menu_bookmark-png": ["menu_bookmark.png", 2, 2, {}],
+                "menu_delete_history-png": ["menu_delete_history.png", 4, 4, {}],
+                "menu_issue_close-png": ["menu_issue_close.png", 4, 4, {}],
+                "menu_delete-png": ["menu_delete.png", 2, 2, {}],
+                "menu_share-png": ["menu_share.png", 2, 2, {}],
+                "action_create-png": ["action_create.png", 0, 0, {}],
+                "menu_filter-png": ["menu_filter.png", 2, 2, {}],
+                "menu_issue_reopen-png": ["menu_issue_reopen.png", 3, 3, {}],
+                "action_refresh-png": ["action_refresh.png", 1, 1, {}],
+                "action_dashboard-png": ["action_dashboard.png", 1, 1, {}],
+                "app_icon-png": ["app_icon.png", 7, 7, {}],
+                "action_search-png": ["action_search.png", 1, 1, {}],
+                "menu_star-png": ["menu_star.png", 3, 3, {}],
+                "action_bookmark-png": ["action_bookmark.png", 1, 1, {}],
+                "menu_refresh-png": ["menu_refresh.png", 3, 3, {}],
+                "menu_issue_open-png": ["menu_issue_open.png", 3, 3, {}],
+                "action_save-png": ["action_save.png", 3, 3, {}],
+                "action_comment-png": ["action_comment.png", 1, 1, {}],
+                "action_gist-png": ["action_gist.png", 1, 1, {}],
+                "menu_edit-png": ["menu_edit.png", 2, 2, {}]
+            }],
+            "drawable-nodpi": ["drawable-nodpi", 24, 24, {
+                "tab_selected-9-png": ["tab_selected.9.png", 0, 0, {}],
+                "gravatar_icon-png": ["gravatar_icon.png", 2, 2, {}],
+                "spinner_outer-png": ["spinner_outer.png", 10, 10, {}],
+                "tab_left-9-png": ["tab_left.9.png", 0, 0, {}],
+                "dropdown_dashboard-png": ["dropdown_dashboard.png", 3, 3, {}],
+                "tab_right-9-png": ["tab_right.9.png", 0, 0, {}],
+                "image_loading_icon-png": ["image_loading_icon.png", 0, 0, {}],
+                "dropdown_gist-png": ["dropdown_gist.png", 1, 1, {}],
+                "tab_left_right-9-png": ["tab_left_right.9.png", 0, 0, {}],
+                "spinner_inner-png": ["spinner_inner.png", 7, 7, {}],
+                "dropdown_bookmark-png": ["dropdown_bookmark.png", 1, 1, {}]
+            }],
+            "values-el": ["values-el", 18903, 265, {
+                "strings-xml": ["strings.xml", 18903, 265, {}]
+            }],
+            "values-zh-rCN": ["values-zh-rCN", 14489, 262, {
+                "strings-xml": ["strings.xml", 14489, 262, {}]
+            }],
+            "xml": ["xml", 3638, 89, {
+                "authenticator-xml": ["authenticator.xml", 877, 22, {}],
+                "sync_adapter-xml": ["sync_adapter.xml", 834, 21, {}],
+                "searchable_issues-xml": ["searchable_issues.xml", 974, 23, {}],
+                "searchable_repos_users-xml": ["searchable_repos_users.xml", 953, 23, {}]
+            }],
+            "values-sk": ["values-sk", 14664, 254, {
+                "strings-xml": ["strings.xml", 14664, 254, {}]
+            }],
+            "menu": ["menu", 18327, 523, {
+                "commit_view-xml": ["commit_view.xml", 1236, 35, {}],
+                "issue_view-xml": ["issue_view.xml", 1579, 45, {}],
+                "issue_filter-xml": ["issue_filter.xml", 882, 25, {}],
+                "user_follow-xml": ["user_follow.xml", 839, 24, {}],
+                "home-xml": ["home.xml", 898, 25, {}],
+                "gist_view-xml": ["gist_view.xml", 1576, 45, {}],
+                "comment-xml": ["comment.xml", 918, 26, {}],
+                "search-xml": ["search.xml", 1092, 30, {}],
+                "gist_create-xml": ["gist_create.xml", 884, 25, {}],
+                "code_view-xml": ["code_view.xml", 845, 24, {}],
+                "refresh-xml": ["refresh.xml", 887, 25, {}],
+                "repository-xml": ["repository.xml", 1068, 33, {}],
+                "issue_edit-xml": ["issue_edit.xml", 915, 26, {}],
+                "file_view-xml": ["file_view.xml", 1172, 35, {}],
+                "login-xml": ["login.xml", 871, 25, {}],
+                "issues-xml": ["issues.xml", 1600, 45, {}],
+                "gists-xml": ["gists.xml", 1065, 30, {}]
+            }],
+            "values-uk": ["values-uk", 18543, 265, {
+                "strings-xml": ["strings.xml", 18543, 265, {}]
+            }],
+            "values-ja": ["values-ja", 12849, 201, {
+                "strings-xml": ["strings.xml", 12849, 201, {}]
+            }],
+            "values-zh-rTW": ["values-zh-rTW", 13482, 235, {
+                "strings-xml": ["strings.xml", 13482, 235, {}]
+            }],
+            "values-hu": ["values-hu", 13217, 220, {
+                "strings-xml": ["strings.xml", 13217, 220, {}]
+            }],
+            "values-tr": ["values-tr", 15752, 265, {
+                "strings-xml": ["strings.xml", 15752, 265, {}]
+            }],
+            "values-fr": ["values-fr", 15780, 264, {
+                "strings-xml": ["strings.xml", 15780, 264, {}]
+            }],
+            "values-ru": ["values-ru", 13993, 209, {
+                "strings-xml": ["strings.xml", 13993, 209, {}]
+            }],
+            "values-v14": ["values-v14", 1637, 43, {
+                "styles-xml": ["styles.xml", 1637, 43, {}]
+            }],
+            "values-de": ["values-de", 15810, 271, {
+                "strings-xml": ["strings.xml", 15810, 271, {}]
+            }],
+            "values-bg": ["values-bg", 17583, 246, {
+                "strings-xml": ["strings.xml", 17583, 246, {}]
+            }],
+            "layout": ["layout", 131935, 3687, {
+                "commit_header-xml": ["commit_header.xml", 3569, 102, {}],
+                "commit_parent_item-xml": ["commit_parent_item.xml", 1078, 30, {}],
+                "commit_compare_file_details_header-xml": ["commit_compare_file_details_header.xml", 892, 25, {}],
+                "commit_file_view-xml": ["commit_file_view.xml", 1387, 40, {}],
+                "item_list-xml": ["item_list.xml", 1434, 41, {}],
+                "loading_item-xml": ["loading_item.xml", 1167, 34, {}],
+                "repo_contributors-xml": ["repo_contributors.xml", 1296, 35, {}],
+                "diff_line_dialog-xml": ["diff_line_dialog.xml", 2054, 63, {}],
+                "gist_file_item-xml": ["gist_file_item.xml", 1334, 37, {}],
+                "milestone-xml": ["milestone.xml", 1267, 34, {}],
+                "comment_create-xml": ["comment_create.xml", 1244, 35, {}],
+                "blob_item-xml": ["blob_item.xml", 1751, 50, {}],
+                "comment_list-xml": ["comment_list.xml", 1430, 40, {}],
+                "issue_details-xml": ["issue_details.xml", 1619, 49, {}],
+                "commit_item-xml": ["commit_item.xml", 2556, 72, {}],
+                "progress_dialog-xml": ["progress_dialog.xml", 1340, 38, {}],
+                "repo_dialog-xml": ["repo_dialog.xml", 3162, 86, {}],
+                "commit_comment_item-xml": ["commit_comment_item.xml", 866, 24, {}],
+                "issue_header-xml": ["issue_header.xml", 5771, 169, {}],
+                "commit_details_header-xml": ["commit_details_header.xml", 854, 24, {}],
+                "commit_file_item-xml": ["commit_file_item.xml", 1497, 43, {}],
+                "issue_number-xml": ["issue_number.xml", 1716, 60, {}],
+                "pager_with_title-xml": ["pager_with_title.xml", 1816, 48, {}],
+                "issues_filter_item-xml": ["issues_filter_item.xml", 1604, 45, {}],
+                "comment_preview-xml": ["comment_preview.xml", 1755, 48, {}],
+                "repo_issue_item-xml": ["repo_issue_item.xml", 1793, 50, {}],
+                "issues_filter_header-xml": ["issues_filter_header.xml", 854, 23, {}],
+                "org_item-xml": ["org_item.xml", 1435, 40, {}],
+                "list_divider-xml": ["list_divider.xml", 847, 23, {}],
+                "comment-xml": ["comment.xml", 2422, 68, {}],
+                "footer_separator-xml": ["footer_separator.xml", 853, 23, {}],
+                "path_item-xml": ["path_item.xml", 1425, 40, {}],
+                "pager_with_tabs-xml": ["pager_with_tabs.xml", 1635, 46, {}],
+                "ref_footer-xml": ["ref_footer.xml", 1593, 44, {}],
+                "user_item-xml": ["user_item.xml", 1258, 36, {}],
+                "commit-xml": ["commit.xml", 1024, 27, {}],
+                "login-xml": ["login.xml", 2997, 82, {}],
+                "issue_search-xml": ["issue_search.xml", 1280, 34, {}],
+                "folder_item-xml": ["folder_item.xml", 2231, 65, {}],
+                "issues_filter_edit-xml": ["issues_filter_edit.xml", 5543, 140, {}],
+                "news_item-xml": ["news_item.xml", 2396, 68, {}],
+                "user_repo_item-xml": ["user_repo_item.xml", 1349, 38, {}],
+                "commit_diff_list-xml": ["commit_diff_list.xml", 1460, 41, {}],
+                "repo_item-xml": ["repo_item.xml", 2822, 80, {}],
+                "nav_dialog-xml": ["nav_dialog.xml", 2840, 79, {}],
+                "org_dropdown_item-xml": ["org_dropdown_item.xml", 1454, 41, {}],
+                "issues_filter_list-xml": ["issues_filter_list.xml", 1275, 34, {}],
+                "repo_details-xml": ["repo_details.xml", 2181, 66, {}],
+                "diff_comment_item-xml": ["diff_comment_item.xml", 955, 26, {}],
+                "repo_code-xml": ["repo_code.xml", 1366, 40, {}],
+                "repo_issue_list-xml": ["repo_issue_list.xml", 1318, 35, {}],
+                "gist_create-xml": ["gist_create.xml", 3970, 103, {}],
+                "tabbed_progress_pager-xml": ["tabbed_progress_pager.xml", 1129, 32, {}],
+                "ref_item-xml": ["ref_item.xml", 1700, 47, {}],
+                "gist_file_view-xml": ["gist_file_view.xml", 839, 21, {}],
+                "dashboard_issue_item-xml": ["dashboard_issue_item.xml", 2086, 58, {}],
+                "gist_header-xml": ["gist_header.xml", 1986, 56, {}],
+                "commit_compare-xml": ["commit_compare.xml", 1033, 27, {}],
+                "collaborator_item-xml": ["collaborator_item.xml", 1573, 45, {}],
+                "commit_diff_line-xml": ["commit_diff_line.xml", 991, 26, {}],
+                "gist_item-xml": ["gist_item.xml", 2861, 82, {}],
+                "pager-xml": ["pager.xml", 842, 21, {}],
+                "commit_diff_file_header-xml": ["commit_diff_file_header.xml", 1830, 52, {}],
+                "issues_filter_details-xml": ["issues_filter_details.xml", 2184, 65, {}],
+                "dialog_list_view-xml": ["dialog_list_view.xml", 896, 23, {}],
+                "comment_item-xml": ["comment_item.xml", 866, 24, {}],
+                "tab-xml": ["tab.xml", 2175, 59, {}],
+                "milestone_item-xml": ["milestone_item.xml", 1747, 49, {}],
+                "commit_comments-xml": ["commit_comments.xml", 859, 22, {}],
+                "commit_list-xml": ["commit_list.xml", 1619, 48, {}],
+                "list_view-xml": ["list_view.xml", 852, 22, {}],
+                "issue_edit-xml": ["issue_edit.xml", 4987, 132, {}],
+                "contributor_item-xml": ["contributor_item.xml", 1618, 49, {}],
+                "label_item-xml": ["label_item.xml", 1305, 37, {}],
+                "commit_file_details_header-xml": ["commit_file_details_header.xml", 922, 26, {}]
+            }],
+            "drawable-ldpi": ["drawable-ldpi", 26, 26, {
+                "menu_random-png": ["menu_random.png", 1, 1, {}],
+                "menu_bookmark-png": ["menu_bookmark.png", 1, 1, {}],
+                "menu_delete_history-png": ["menu_delete_history.png", 2, 2, {}],
+                "menu_issue_close-png": ["menu_issue_close.png", 2, 2, {}],
+                "menu_delete-png": ["menu_delete.png", 1, 1, {}],
+                "menu_share-png": ["menu_share.png", 1, 1, {}],
+                "action_create-png": ["action_create.png", 0, 0, {}],
+                "menu_filter-png": ["menu_filter.png", 1, 1, {}],
+                "menu_issue_reopen-png": ["menu_issue_reopen.png", 2, 2, {}],
+                "action_dashboard-png": ["action_dashboard.png", 1, 1, {}],
+                "app_icon-png": ["app_icon.png", 3, 3, {}],
+                "action_search-png": ["action_search.png", 1, 1, {}],
+                "menu_star-png": ["menu_star.png", 1, 1, {}],
+                "action_bookmark-png": ["action_bookmark.png", 0, 0, {}],
+                "menu_refresh-png": ["menu_refresh.png", 2, 2, {}],
+                "menu_issue_open-png": ["menu_issue_open.png", 2, 2, {}],
+                "action_save-png": ["action_save.png", 2, 2, {}],
+                "action_comment-png": ["action_comment.png", 1, 1, {}],
+                "action_gist-png": ["action_gist.png", 1, 1, {}],
+                "menu_edit-png": ["menu_edit.png", 1, 1, {}]
+            }],
+            "values-ko": ["values-ko", 11336, 201, {
+                "strings-xml": ["strings.xml", 11336, 201, {}]
+            }],
+            "values-sv": ["values-sv", 12457, 217, {
+                "strings-xml": ["strings.xml", 12457, 217, {}]
+            }],
+            "drawable-xhdpi": ["drawable-xhdpi", 65, 65, {
+                "menu_random-png": ["menu_random.png", 4, 4, {}],
+                "menu_bookmark-png": ["menu_bookmark.png", 2, 2, {}],
+                "menu_delete_history-png": ["menu_delete_history.png", 5, 5, {}],
+                "menu_issue_close-png": ["menu_issue_close.png", 5, 5, {}],
+                "menu_delete-png": ["menu_delete.png", 3, 3, {}],
+                "menu_share-png": ["menu_share.png", 3, 3, {}],
+                "action_create-png": ["action_create.png", 0, 0, {}],
+                "menu_filter-png": ["menu_filter.png", 2, 2, {}],
+                "menu_issue_reopen-png": ["menu_issue_reopen.png", 5, 5, {}],
+                "action_refresh-png": ["action_refresh.png", 1, 1, {}],
+                "action_dashboard-png": ["action_dashboard.png", 2, 2, {}],
+                "app_icon-png": ["app_icon.png", 9, 9, {}],
+                "action_search-png": ["action_search.png", 1, 1, {}],
+                "menu_star-png": ["menu_star.png", 4, 4, {}],
+                "action_bookmark-png": ["action_bookmark.png", 1, 1, {}],
+                "menu_refresh-png": ["menu_refresh.png", 5, 5, {}],
+                "menu_issue_open-png": ["menu_issue_open.png", 5, 5, {}],
+                "action_save-png": ["action_save.png", 3, 3, {}],
+                "action_comment-png": ["action_comment.png", 1, 1, {}],
+                "action_gist-png": ["action_gist.png", 1, 1, {}],
+                "menu_edit-png": ["menu_edit.png", 3, 3, {}]
+            }],
+            "values": ["values", 31516, 682, {
+                "styles-xml": ["styles.xml", 9229, 239, {}],
+                "theme-xml": ["theme.xml", 1696, 37, {}],
+                "colors-xml": ["colors.xml", 3819, 80, {}],
+                "roboguice-xml": ["roboguice.xml", 778, 22, {}],
+                "typeface-xml": ["typeface.xml", 1044, 28, {}],
+                "strings-xml": ["strings.xml", 14950, 276, {}]
+            }],
+            "values-it": ["values-it", 15454, 264, {
+                "strings-xml": ["strings.xml", 15454, 264, {}]
+            }],
+            "values-iw": ["values-iw", 15985, 264, {
+                "strings-xml": ["strings.xml", 15985, 264, {}]
+            }],
+            "drawable": ["drawable", 26988, 776, {
+                "spinner-xml": ["spinner.xml", 1214, 34, {}],
+                "edit_text_cursor-xml": ["edit_text_cursor.xml", 835, 24, {}],
+                "milestone_background-xml": ["milestone_background.xml", 1311, 41, {}],
+                "label_background-xml": ["label_background.xml", 2089, 67, {}],
+                "diff_add_background-xml": ["diff_add_background.xml", 854, 22, {}],
+                "footer_selector-xml": ["footer_selector.xml", 877, 22, {}],
+                "tab_selector_left_right-xml": ["tab_selector_left_right.xml", 944, 23, {}],
+                "pager_title_background-xml": ["pager_title_background.xml", 1530, 43, {}],
+                "list_item_background-xml": ["list_item_background.xml", 856, 22, {}],
+                "list_divider-xml": ["list_divider.xml", 990, 30, {}],
+                "diff_remove_background-xml": ["diff_remove_background.xml", 857, 22, {}],
+                "tab_selector_right-xml": ["tab_selector_right.xml", 939, 23, {}],
+                "edit_text_background-xml": ["edit_text_background.xml", 1466, 49, {}],
+                "diff_marker_background-xml": ["diff_marker_background.xml", 860, 22, {}],
+                "actionbar_spinner-xml": ["actionbar_spinner.xml", 993, 29, {}],
+                "section_selector-xml": ["section_selector.xml", 878, 22, {}],
+                "section_selected_background-xml": ["section_selected_background.xml", 1138, 35, {}],
+                "sign_up_background-xml": ["sign_up_background.xml", 1001, 30, {}],
+                "actionbar_background-xml": ["actionbar_background.xml", 1380, 40, {}],
+                "header_separator_background-xml": ["header_separator_background.xml", 1530, 43, {}],
+                "section_background-xml": ["section_background.xml", 1138, 35, {}],
+                "tab_selector_left-xml": ["tab_selector_left.xml", 938, 23, {}],
+                "milestone_closed_background-xml": ["milestone_closed_background.xml", 916, 26, {}],
+                "inset_background-xml": ["inset_background.xml", 1454, 49, {}]
+            }],
+            "values-pt": ["values-pt", 11863, 205, {
+                "strings-xml": ["strings.xml", 11863, 205, {}]
+            }]
+        }],
+        "libs": ["libs", 2, 1, {
+            "-gitignore": [".gitignore", 2, 1, {}]
+        }],
+        "-classpath": [".classpath", 374, 9, {}]
+    }],
+    "pom-xml": ["pom.xml", 2264, 57, {}],
+    "proguard-cfg": ["proguard.cfg", 2480, 57, {}],
+    "integration-tests": ["integration-tests", 124236, 3338, {
+        "src": ["src", 91960, 2837, {
+            "main.java.com.github.mobile": ["main.java.com.github.mobile", 91960, 2837, {
+                                "tests": ["tests", 91960, 2837, {
+                                    "repo": ["repo", 9249, 286, {
+                                        "RepositoryUriMatcherTest-java": ["RepositoryUriMatcherTest.java", 2954, 91, {}],
+                                        "SearchActivityTest-java": ["SearchActivityTest.java", 1265, 45, {}],
+                                        "RepositoryEventMatcherTest-java": ["RepositoryEventMatcherTest.java", 1951, 54, {}],
+                                        "RecentRepositoriesTest-java": ["RecentRepositoriesTest.java", 3079, 96, {}]
+                                    }],
+                                    "gist": ["gist", 12502, 400, {
+                                        "GistStoreTest-java": ["GistStoreTest.java", 1615, 49, {}],
+                                        "GistUriMatcherTest-java": ["GistUriMatcherTest.java", 2077, 69, {}],
+                                        "CreateCommentActivityTest-java": ["CreateCommentActivityTest.java", 2002, 66, {}],
+                                        "CreateGistActivityTest-java": ["CreateGistActivityTest.java", 2015, 65, {}],
+                                        "GistUrlMatcherTest-java": ["GistUrlMatcherTest.java", 2004, 57, {}],
+                                        "GistFilesViewActivityTest-java": ["GistFilesViewActivityTest.java", 2789, 94, {}]
+                                    }],
+                                    "issue": ["issue", 15368, 461, {
+                                        "IssueUrlMatcherTest-java": ["IssueUrlMatcherTest.java", 1834, 52, {}],
+                                        "IssueUriMatcherTest-java": ["IssueUriMatcherTest.java", 3584, 102, {}],
+                                        "IssueStoreTest-java": ["IssueStoreTest.java", 2027, 57, {}],
+                                        "CreateCommentActivityTest-java": ["CreateCommentActivityTest.java", 2008, 66, {}],
+                                        "EditIssueActivityTest-java": ["EditIssueActivityTest.java", 2068, 68, {}],
+                                        "EditIssuesFilterActivityTest-java": ["EditIssuesFilterActivityTest.java", 1557, 49, {}],
+                                        "IssueFilterTest-java": ["IssueFilterTest.java", 2290, 67, {}]
+                                    }],
+                                    "util": ["util", 6922, 230, {
+                                        "HtmlUtilsTest-java": ["HtmlUtilsTest.java", 6922, 230, {}]
+                                    }],
+                                    "ActivityTest-java": ["ActivityTest.java", 2436, 102, {}],
+                                    "NewsEventTextTest-java": ["NewsEventTextTest.java", 9546, 302, {}],
+                                    "FiltersViewActivityTest-java": ["FiltersViewActivityTest.java", 966, 32, {}],
+                                    "commit": ["commit", 21084, 617, {
+                                        "CommitUrlMatcherTest-java": ["CommitUrlMatcherTest.java", 2163, 61, {}],
+                                        "CreateCommentActivityTest-java": ["CreateCommentActivityTest.java", 2079, 68, {}],
+                                        "DiffStylerTest-java": ["DiffStylerTest.java", 4331, 143, {}],
+                                        "CommitUriMatcherTest-java": ["CommitUriMatcherTest.java", 2983, 87, {}],
+                                        "FullCommitTest-java": ["FullCommitTest.java", 4326, 115, {}],
+                                        "CommitUtilsTest-java": ["CommitUtilsTest.java", 5202, 143, {}]
+                                    }],
+                                    "ref": ["ref", 4331, 107, {
+                                        "RefUtilsTest-java": ["RefUtilsTest.java", 4331, 107, {}]
+                                    }],
+                                    "user": ["user", 9556, 300, {
+                                        "LoginActivityTest-java": ["LoginActivityTest.java", 2106, 67, {}],
+                                        "UserUrlMatcherTest-java": ["UserUrlMatcherTest.java", 2352, 78, {}],
+                                        "UserUriMatcherTest-java": ["UserUriMatcherTest.java", 2613, 87, {}],
+                                        "UserComparatorTest-java": ["UserComparatorTest.java", 2485, 68, {}]
+                                    }]
+                            }]
+            }]
+        }],
+        "-project": [".project", 859, 34, {}],
+        "AndroidManifest-xml": ["AndroidManifest.xml", 627, 20, {}],
+        "pom-xml": ["pom.xml", 3350, 86, {}],
+        "project-properties": ["project.properties", 372, 12, {}],
+        "-settings": [".settings", 26610, 339, {
+            "org-eclipse-jdt-core-prefs": ["org.eclipse.jdt.core.prefs", 23821, 282, {}],
+            "org-eclipse-jdt-ui-prefs": ["org.eclipse.jdt.ui.prefs", 2789, 57, {}]
+        }],
+        "-classpath": [".classpath", 458, 10, {}]
+    }],
+    "-gitignore": [".gitignore", 191, 20, {}],
+    "README-md": ["README.md", 3083, 65, {}],
+    "-travis-yml": [".travis.yml", 569, 15, {}]
+}];
+
+    window.onload = init_plots;
+    window.onresize = init_plots;
+
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div id="chart">
+            <div id="code_hierarchy_legend">
+                <h2>Project: github-android</h2>
+                <p>2208266 characters, 61815 lines of code.</p>
+            </div>
+            <div id="code_hierarchy"></div>
+        </div>
+    </div>
+
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
+</body>
+</html>

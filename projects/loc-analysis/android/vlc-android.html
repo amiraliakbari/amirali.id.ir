@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Code Analysis of "vlc-android" Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            padding: 10px 0 30px;
+            font-family: Century Gothic, Arial, Helvetica, sans-serif;
+        }
+
+        #code_hierarchy_legend {
+            height: 80px;
+            text-align: center;
+        }
+
+        #code_hierarchy {}
+
+        #chart {
+            width: 600px;
+            height: 600px;
+            margin: 0 auto;
+        }
+    </style>
+    <link href="http://www.andreas-dewes.de/code_is_beautiful/flask_files/bootstrap-responsive.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.min.js"></script>
+    <script lang="text/javascript">
+
+    function init_code_hierarchy_plot(element_id, data) {
+        var plot = document.getElementById(element_id);
+
+        while (plot.hasChildNodes()) {
+            plot.removeChild(plot.firstChild);
+        }
+
+        var width = plot.offsetWidth;
+        var height = width;
+        var name_index = 0;
+        var count_index = 1;
+        var children_index = 3;
+
+        var max_depth = 3;
+
+        var data_slices = [];
+        var max_level = 7;
+        var color = d3.scale.category20c();
+
+        var svg = d3.select("#" + element_id).append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        function process_data(data, level, start_deg, stop_deg) {
+            var name = data[0];
+            var total = data[1];
+            var children = data[3];
+            var current_deg = start_deg;
+            if (level > max_level) {
+                return;
+            }
+            if (start_deg == stop_deg) {
+                return;
+            }
+            data_slices.push([start_deg, stop_deg, name, level, data[1], data[2]]);
+            for (var key in children) {
+                child = children[key];
+                var inc_deg = (stop_deg - start_deg) / total * child[count_index];
+                var child_start_deg = current_deg;
+                current_deg += inc_deg;
+                var child_stop_deg = current_deg;
+                var span_deg = child_stop_deg - child_start_deg;
+                process_data(child, level + 1, child_start_deg, child_stop_deg);
+            }
+        }
+
+        process_data(data, 0, 0, 360. / 180.0 * Math.PI);
+
+        var ref = data_slices[0];
+        var next_ref = ref;
+        var last_refs = [];
+
+        var thickness = width / 2.0 / (max_level + 2) * 1.1;
+
+        var arc = d3.svg.arc()
+                .startAngle(function (d) {
+                    if (d[3] == 0) {
+                        return d[0];
+                    }
+                    return d[0] + 0.01;
+                })
+                .endAngle(function (d) {
+                    if (d[3] == 0) {
+                        return d[1];
+                    }
+                    return d[1] - 0.01;
+                })
+                .innerRadius(function (d) {
+                    return 1.1 * d[3] * thickness;
+                })
+                .outerRadius(function (d) {
+                    return (1.1 * d[3] + 1) * thickness;
+                });
+
+        var slices = svg.selectAll(".form")
+                .data(function (d) {
+                    return data_slices;
+                })
+                .enter()
+                .append("g");
+        slices.append("path")
+                .attr("d", arc)
+                .attr("id", function (d, i) {
+                    return element_id + i;
+                })
+                .style("fill", function (d) {
+                    return color(d[2]);
+                })
+                .on("click", animate)
+                .on("mouseover", update_legend)
+                .on("mouseout", remove_legend)
+                .attr("class", "form")
+                .append("svg:title")
+                .text(function (d) {
+                    return d[2] + "," + d[3];
+                });
+
+        /*    slices.append("text")
+         .style("font-size", "10px")
+         .append("textPath")
+         .attr("xlink:href",function(d,i){return "#"+element_id+i;})
+         .text(function(d){return d[2]})
+         .attr("pointer-events","none")*/
+
+        var legend = d3.select("#" + element_id + "_legend")
+
+        function update_legend(d) {
+            legend.html("<h2>" + d[2] + "&nbsp;</h2><p>" + d[4] + " characters, " + d[5] + " lines of code.</p>");
+            legend.transition().duration(200).style("opacity", "1");
+        }
+
+        function remove_legend(d) {
+            legend.transition().duration(1000).style("opacity", "0");
+    //        legend.html("<h2>&nbsp;</h2>")
+        }
+
+        function get_start_angle(d, ref) {
+            if (ref) {
+                var ref_span = ref[1] - ref[0];
+                return (d[0] - ref[0]) / ref_span * Math.PI * 2.0
+            }
+            else {
+                return d[0];
+            }
+        }
+
+        function get_stop_angle(d, ref) {
+            if (ref) {
+                var ref_span = ref[1] - ref[0];
+                return (d[1] - ref[0]) / ref_span * Math.PI * 2.0
+            }
+            else {
+                return d[0];
+            }
+        }
+
+        function get_level(d, ref) {
+            if (ref) {
+                return d[3] - ref[3];
+            }
+            else {
+                return d[3];
+            }
+        }
+
+        function rebaseTween(new_ref) {
+            return function (d) {
+                var level = d3.interpolate(get_level(d, ref), get_level(d, new_ref));
+                var start_deg = d3.interpolate(get_start_angle(d, ref), get_start_angle(d, new_ref));
+                var stop_deg = d3.interpolate(get_stop_angle(d, ref), get_stop_angle(d, new_ref));
+                var opacity = d3.interpolate(100, 0);
+                return function (t) {
+                    return arc([start_deg(t), stop_deg(t), d[2], level(t)]);
+                }
+            }
+        }
+
+        var animating = false;
+
+        function animate(d) {
+            if (animating) {
+                return;
+            }
+            animating = true;
+            var revert = false;
+            var new_ref;
+            if (d == ref && last_refs.length > 0) {
+                revert = true;
+                last_ref = last_refs.pop();
+            }
+            if (revert) {
+                d = last_ref;
+                new_ref = ref;
+                svg.selectAll(".form")
+                        .filter(
+                        function (b) {
+                            if (b[0] >= last_ref[0] && b[1] <= last_ref[1] && b[3] >= last_ref[3]) {
+                                return true;
+                            }
+                            return false;
+                        }
+                )
+                        .transition().duration(1000).style("opacity", "1").attr("pointer-events", "all");
+            }
+            else {
+                new_ref = d;
+                svg.selectAll(".form")
+                        .filter(
+                        function (b) {
+                            if (b[0] < d[0] || b[1] > d[1] || b[3] < d[3]) {
+                                return true;
+                            }
+                            return false;
+                        }
+                )
+                        .transition().duration(1000).style("opacity", "0").attr("pointer-events", "none");
+            }
+            svg.selectAll(".form")
+                    .filter(
+                    function (b) {
+                        if (b[0] >= new_ref[0] && b[1] <= new_ref[1] && b[3] >= new_ref[3]) {
+                            return true;
+                        }
+                        return false;
+                    }
+            )
+                    .transition().duration(1000).attrTween("d", rebaseTween(d));
+            setTimeout(function () {
+                animating = false;
+                if (!revert) {
+                    last_refs.push(ref);
+                    ref = d;
+                }
+                else {
+                    ref = d;
+                }
+            }, 1000);
+        };
+
+    }
+
+    function init_plots() {
+        init_code_hierarchy_plot("code_hierarchy", code_hierarchy_data);
+    }
+
+    code_hierarchy_data = ["Project: vlc-android", 1508396, 34419, {"src": ["src", 584668, 16011, {"org": ["org", 584668, 16011, {"videolan": ["videolan", 584668, 16011, {"libvlc": ["libvlc", 45960, 1367, {"TrackInfo-java": ["TrackInfo.java", 1757, 53, {}], "Aout-java": ["Aout.java", 2940, 75, {}], "LibVlcException-java": ["LibVlcException.java", 1857, 63, {}], "IVideoPlayer-java": ["IVideoPlayer.java", 1634, 35, {}], "LibVlcUtil-java": ["LibVlcUtil.java", 15449, 422, {}], "EventHandler-java": ["EventHandler.java", 5673, 124, {}], "LibVLC-java": ["LibVLC.java", 16650, 595, {}]}], "vlc": ["vlc", 521557, 14164, {"VLCCallbackTask-java": ["VLCCallbackTask.java", 2552, 79, {}], "WeakHandler-java": ["WeakHandler.java", 1360, 38, {}], "widget": ["widget", 35140, 936, {"VLCAppWidgetProvider-java": ["VLCAppWidgetProvider.java", 6683, 133, {}], "ExpandableLayout-java": ["ExpandableLayout.java", 3584, 109, {}], "PlayerControlClassic-java": ["PlayerControlClassic.java", 3530, 96, {}], "PlayerControlWheel-java": ["PlayerControlWheel.java", 4780, 127, {}], "AudioMiniPlayer-java": ["AudioMiniPlayer.java", 8060, 228, {}], "FlingViewGroup-java": ["FlingViewGroup.java", 8503, 243, {}]}], "AudioService-java": ["AudioService.java", 47332, 1224, {}], "VlcRunnable-java": ["VlcRunnable.java", 1370, 40, {}], "interfaces": ["interfaces", 10891, 295, {"IAudioPlayer-java": ["IAudioPlayer.java", 1131, 28, {}], "OnExpandableListener-java": ["OnExpandableListener.java", 1152, 26, {}], "IAudioServiceCallback-aidl": ["IAudioServiceCallback.aidl", 1133, 26, {}], "OnPlayerControlListener-java": ["OnPlayerControlListener.java", 1349, 34, {}], "IAudioService-aidl": ["IAudioService.aidl", 2055, 56, {}], "ISortable-java": ["ISortable.java", 1128, 26, {}], "IPlayerControl-java": ["IPlayerControl.java", 1261, 31, {}], "IAudioPlayerControl-java": ["IAudioPlayerControl.java", 1682, 68, {}]}], "Media-java": ["Media.java", 12943, 417, {}], "RemoteControlClientReceiver-java": ["RemoteControlClientReceiver.java", 5191, 127, {}], "MediaDatabase-java": ["MediaDatabase.java", 22135, 628, {}], "Util-java": ["Util.java", 15546, 428, {}], "MurmurHash-java": ["MurmurHash.java", 5666, 184, {}], "AudioServiceController-java": ["AudioServiceController.java", 13543, 375, {}], "gui": ["gui", 311036, 8377, {"MainActivity-java": ["MainActivity.java", 26163, 683, {}], "HistoryFragment-java": ["HistoryFragment.java", 4236, 114, {}], "SearchActivity-java": ["SearchActivity.java", 10020, 279, {}], "AboutMainFragment-java": ["AboutMainFragment.java", 3376, 78, {}], "CompatErrorActivity-java": ["CompatErrorActivity.java", 3187, 89, {}], "CommonDialogs-java": ["CommonDialogs.java", 7472, 178, {}], "SearchHistoryAdapter-java": ["SearchHistoryAdapter.java", 2179, 59, {}], "HistoryAdapter-java": ["HistoryAdapter.java", 5591, 166, {}], "PreferencesActivity-java": ["PreferencesActivity.java", 10571, 237, {}], "AboutActivity-java": ["AboutActivity.java", 5978, 150, {}], "DirectoryAdapter-java": ["DirectoryAdapter.java", 15666, 449, {}], "video": ["video", 99344, 2708, {"VideoGridAnimator-java": ["VideoGridAnimator.java", 6254, 160, {}], "VideoListAdapter-java": ["VideoListAdapter.java", 7982, 231, {}], "MediaInfoAdapter-java": ["MediaInfoAdapter.java", 4364, 108, {}], "VideoPlayerActivity-java": ["VideoPlayerActivity.java", 58258, 1588, {}], "VideoGridFragment-java": ["VideoGridFragment.java", 16654, 448, {}], "MediaInfoActivity-java": ["MediaInfoActivity.java", 5832, 173, {}]}], "SidebarAdapter-java": ["SidebarAdapter.java", 5547, 157, {}], "DebugLogActivity-java": ["DebugLogActivity.java", 3975, 106, {}], "SearchResultAdapter-java": ["SearchResultAdapter.java", 2493, 72, {}], "AboutLicenceFragment-java": ["AboutLicenceFragment.java", 2119, 49, {}], "DirectoryViewFragment-java": ["DirectoryViewFragment.java", 7964, 212, {}], "expandable": ["expandable", 12117, 311, {"SpeedSelector-java": ["SpeedSelector.java", 3280, 90, {}], "JumpToTime-java": ["JumpToTime.java", 4076, 98, {}], "TimeSleep-java": ["TimeSleep.java", 4761, 123, {}]}], "audio": ["audio", 67199, 1834, {"AudioListFragment-java": ["AudioListFragment.java", 9779, 286, {}], "AudioListAdapter-java": ["AudioListAdapter.java", 4246, 128, {}], "AudioPlayerActivity-java": ["AudioPlayerActivity.java", 11806, 332, {}], "AudioBrowserFragment-java": ["AudioBrowserFragment.java", 20339, 538, {}], "AudioUtil-java": ["AudioUtil.java", 12008, 292, {}], "AudioPlaylistAdapter-java": ["AudioPlaylistAdapter.java", 9021, 258, {}]}], "BrowserActivity-java": ["BrowserActivity.java", 9726, 282, {}], "BrowserAdapter-java": ["BrowserAdapter.java", 6113, 164, {}]}], "VLCApplication-java": ["VLCApplication.java", 3790, 107, {}], "Thumbnailer-java": ["Thumbnailer.java", 6703, 199, {}], "VlcCrashHandler-java": ["VlcCrashHandler.java", 4843, 126, {}], "BitmapCache-java": ["BitmapCache.java", 3754, 109, {}], "MediaLibrary-java": ["MediaLibrary.java", 14896, 402, {}], "RepeatType-java": ["RepeatType.java", 1105, 27, {}], "PhoneStateReceiver-java": ["PhoneStateReceiver.java", 1761, 46, {}]}], "android": ["android", 17151, 480, {"ui": ["ui", 17151, 480, {"GridFragment-java": ["GridFragment.java", 14250, 395, {}], "SherlockGridFragment-java": ["SherlockGridFragment.java", 2901, 85, {}]}]}]}]}]}], "-project": [".project", 806, 34, {}], "build-xml": ["build.xml", 3620, 94, {}], "AndroidManifest-xml": ["AndroidManifest.xml", 20416, 408, {}], "proguard-cfg": ["proguard.cfg", 1248, 41, {}], "project-properties": ["project.properties", 524, 15, {}], "-gitignore": [".gitignore", 47, 7, {}], "res": ["res", 693890, 12490, {"values-eu": ["values-eu", 11584, 199, {"strings-xml": ["strings.xml", 11584, 199, {}]}], "values-et": ["values-et", 9362, 176, {"strings-xml": ["strings.xml", 9362, 176, {}]}], "drawable-mdpi": ["drawable-mdpi", 5, 5, {"icon-png": ["icon.png", 2, 2, {}], "ic_menu_goto-png": ["ic_menu_goto.png", 0, 0, {}], "ic_menu_refresh-png": ["ic_menu_refresh.png", 1, 1, {}], "ic_menu_archive-png": ["ic_menu_archive.png", 0, 0, {}], "ic_menu_search-png": ["ic_menu_search.png", 1, 1, {}], "ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}], "ic_menu_revert-png": ["ic_menu_revert.png", 1, 1, {}]}], "values-cy": ["values-cy", 13236, 220, {"strings-xml": ["strings.xml", 13236, 220, {}]}], "color": ["color", 1288, 24, {"list_title-xml": ["list_title.xml", 326, 6, {}], "list_title_last-xml": ["list_title_last.xml", 316, 6, {}], "list_subtitle-xml": ["list_subtitle.xml", 324, 6, {}], "list_menu-xml": ["list_menu.xml", 322, 6, {}]}], "values-it": ["values-it", 12958, 208, {"strings-xml": ["strings.xml", 12958, 208, {}]}], "values-cs": ["values-cs", 12597, 207, {"strings-xml": ["strings.xml", 12597, 207, {}]}], "drawable-hdpi-v9": ["drawable-hdpi-v9", 0, 0, {"ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}]}], "drawable-hdpi": ["drawable-hdpi", 591, 42, {"ic_folder-png": ["ic_folder.png", 3, 3, {}], "wheel_play-png": ["wheel_play.png", 9, 9, {}], "wheel_pause-png": ["wheel_pause.png", 9, 9, {}], "ic_menu_search-png": ["ic_menu_search.png", 1, 1, {}], "ic_bookmarks-png": ["ic_bookmarks.png", 5, 5, {}], "icon-png": ["icon.png", 4, 4, {}], "ic_menu_goto-png": ["ic_menu_goto.png", 1, 1, {}], "ic_menu_refresh-png": ["ic_menu_refresh.png", 1, 1, {}], "ic_menu_archive-png": ["ic_menu_archive.png", 1, 1, {}], "ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}], "dropdown_ic_arrow-xml": ["dropdown_ic_arrow.xml", 556, 7, {}], "dropdown_ic_arrow_glow-png": ["dropdown_ic_arrow_glow.png", 0, 0, {}], "actionbar_shadow-png": ["actionbar_shadow.png", 0, 0, {}], "ic_menu_revert-png": ["ic_menu_revert.png", 1, 1, {}], "dropdown_ic_arrow_normal-png": ["dropdown_ic_arrow_normal.png", 0, 0, {}], "slidingmenu_shadow-png": ["slidingmenu_shadow.png", 0, 0, {}]}], "drawable-mdpi-v9": ["drawable-mdpi-v9", 0, 0, {"ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}]}], "values-ar": ["values-ar", 6840, 114, {"strings-xml": ["strings.xml", 6840, 114, {}]}], "values-zh-rCN": ["values-zh-rCN", 11328, 195, {"strings-xml": ["strings.xml", 11328, 195, {}]}], "values-mr": ["values-mr", 17231, 201, {"strings-xml": ["strings.xml", 17231, 201, {}]}], "values-ca": ["values-ca", 12296, 198, {"strings-xml": ["strings.xml", 12296, 198, {}]}], "xml": ["xml", 5307, 125, {"vlcwidget-xml": ["vlcwidget.xml", 247, 6, {}], "preferences-xml": ["preferences.xml", 4815, 113, {}], "searchable-xml": ["searchable.xml", 245, 6, {}]}], "values-sk": ["values-sk", 12740, 204, {"strings-xml": ["strings.xml", 12740, 204, {}]}], "values-es": ["values-es", 12414, 201, {"strings-xml": ["strings.xml", 12414, 201, {}]}], "values-he": ["values-he", 13750, 201, {"strings-xml": ["strings.xml", 13750, 201, {}]}], "menu": ["menu", 4539, 132, {"directory_view-xml": ["directory_view.xml", 625, 18, {}], "audio_player_mini-xml": ["audio_player_mini.xml", 200, 7, {}], "video_list-xml": ["video_list.xml", 613, 18, {}], "media_library-xml": ["media_library.xml", 1635, 45, {}], "search-xml": ["search.xml", 287, 8, {}], "history_view-xml": ["history_view.xml", 306, 10, {}], "audio_list_browser-xml": ["audio_list_browser.xml", 873, 26, {}]}], "values-lt": ["values-lt", 12776, 210, {"strings-xml": ["strings.xml", 12776, 210, {}]}], "values-hi": ["values-hi", 18150, 201, {"strings-xml": ["strings.xml", 18150, 201, {}]}], "drawable-xhdpi": ["drawable-xhdpi", 24, 24, {"ic_bookmarks-png": ["ic_bookmarks.png", 8, 8, {}], "icon-png": ["icon.png", 7, 7, {}], "ic_menu_goto-png": ["ic_menu_goto.png", 1, 1, {}], "ic_menu_refresh-png": ["ic_menu_refresh.png", 2, 2, {}], "ic_menu_archive-png": ["ic_menu_archive.png", 1, 1, {}], "ic_menu_search-png": ["ic_menu_search.png", 2, 2, {}], "ic_stat_vlc-png": ["ic_stat_vlc.png", 1, 1, {}], "ic_menu_revert-png": ["ic_menu_revert.png", 2, 2, {}]}], "values-uk": ["values-uk", 16738, 214, {"strings-xml": ["strings.xml", 16738, 214, {}]}], "values-hr": ["values-hr", 12205, 203, {"strings-xml": ["strings.xml", 12205, 203, {}]}], "values-ja": ["values-ja", 13520, 195, {"strings-xml": ["strings.xml", 13520, 195, {}]}], "values-zh-rTW": ["values-zh-rTW", 10798, 190, {"strings-xml": ["strings.xml", 10798, 190, {}]}], "values-ur": ["values-ur", 12690, 178, {"strings-xml": ["strings.xml", 12690, 178, {}]}], "drawable-hdpi-v11": ["drawable-hdpi-v11", 0, 0, {"ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}]}], "values": ["values", 56371, 969, {"styles-xml": ["styles.xml", 4033, 76, {}], "dimens-xml": ["dimens.xml", 106, 4, {}], "colors-xml": ["colors.xml", 559, 15, {}], "values-bs": ["values-bs", 12501, 207, {"strings-xml": ["strings.xml", 12501, 207, {}]}], "attrs-xml": ["attrs.xml", 606, 14, {}], "values-bn-rIN": ["values-bn-rIN", 11254, 131, {"strings-xml": ["strings.xml", 11254, 131, {}]}], "values-pt-rBR": ["values-pt-rBR", 7801, 141, {"strings-xml": ["strings.xml", 7801, 141, {}]}], "strings-xml": ["strings.xml", 19511, 381, {}]}], "values-wa": ["values-wa", 6375, 110, {"strings-xml": ["strings.xml", 6375, 110, {}]}], "drawable-xhdpi-v9": ["drawable-xhdpi-v9", 0, 0, {"ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}]}], "values-sr": ["values-sr", 14973, 204, {"strings-xml": ["strings.xml", 14973, 204, {}]}], "values-fr": ["values-fr", 12889, 202, {"strings-xml": ["strings.xml", 12889, 202, {}]}], "values-ru": ["values-ru", 15863, 207, {"strings-xml": ["strings.xml", 15863, 207, {}]}], "anim": ["anim", 1868, 54, {"anim_leave_bottom-xml": ["anim_leave_bottom.xml", 311, 9, {}], "anim_enter_right-xml": ["anim_enter_right.xml", 311, 9, {}], "anim_enter_bottom-xml": ["anim_enter_bottom.xml", 311, 9, {}], "anim_leave_right-xml": ["anim_leave_right.xml", 311, 9, {}], "anim_leave_left-xml": ["anim_leave_left.xml", 312, 9, {}], "anim_enter_left-xml": ["anim_enter_left.xml", 312, 9, {}]}], "values-nb": ["values-nb", 11478, 197, {"strings-xml": ["strings.xml", 11478, 197, {}]}], "drawable-mdpi-v11": ["drawable-mdpi-v11", 0, 0, {"ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}]}], "values-da": ["values-da", 11974, 201, {"strings-xml": ["strings.xml", 11974, 201, {}]}], "values-nl": ["values-nl", 12542, 208, {"strings-xml": ["strings.xml", 12542, 208, {}]}], "values-v14": ["values-v14", 65, 3, {"dimens-xml": ["dimens.xml", 65, 3, {}]}], "values-de": ["values-de", 13167, 208, {"strings-xml": ["strings.xml", 13167, 208, {}]}], "values-v11": ["values-v11", 1378, 23, {"styles-xml": ["styles.xml", 1378, 23, {}]}], "layout": ["layout", 93152, 2539, {"directory_view-xml": ["directory_view.xml", 311, 10, {}], "about_licence-xml": ["about_licence.xml", 382, 12, {}], "notification_expanded-xml": ["notification_expanded.xml", 3822, 107, {}], "info_dialog-xml": ["info_dialog.xml", 2806, 81, {}], "audio_browser_playlist_child-xml": ["audio_browser_playlist_child.xml", 1700, 50, {}], "sliding_menu-xml": ["sliding_menu.xml", 450, 10, {}], "about-xml": ["about.xml", 2347, 66, {}], "expandable_layout-xml": ["expandable_layout.xml", 2095, 59, {}], "expandable_speed_selector-xml": ["expandable_speed_selector.xml", 1804, 53, {}], "sidebar-xml": ["sidebar.xml", 435, 13, {}], "player_contol_wheel-xml": ["player_contol_wheel.xml", 482, 13, {}], "expandable_time_sleep-xml": ["expandable_time_sleep.xml", 1564, 48, {}], "about_main-xml": ["about_main.xml", 4460, 123, {}], "audio_player_mini-xml": ["audio_player_mini.xml", 3085, 79, {}], "history_list-xml": ["history_list.xml", 770, 23, {}], "advanced_options-xml": ["advanced_options.xml", 1898, 54, {}], "directory_view_item-xml": ["directory_view_item.xml", 1631, 45, {}], "video_grid-xml": ["video_grid.xml", 3264, 89, {}], "search-xml": ["search.xml", 1516, 41, {}], "preferences-xml": ["preferences.xml", 212, 7, {}], "browser_item-xml": ["browser_item.xml", 820, 24, {}], "audio_list-xml": ["audio_list.xml", 1228, 37, {}], "expandable_jump_to_time-xml": ["expandable_jump_to_time.xml", 1642, 52, {}], "sidebar_item-xml": ["sidebar_item.xml", 532, 15, {}], "player-xml": ["player.xml", 8727, 215, {}], "audio_browser_playlist-xml": ["audio_browser_playlist.xml", 1798, 52, {}], "debug_log-xml": ["debug_log.xml", 1498, 46, {}], "video_grid_item-xml": ["video_grid_item.xml", 2485, 62, {}], "not_compatible-xml": ["not_compatible.xml", 1471, 41, {}], "list_header-xml": ["list_header.xml", 708, 21, {}], "audio_player-xml": ["audio_player.xml", 8258, 216, {}], "video_list_item-xml": ["video_list_item.xml", 2580, 64, {}], "audio_browser-xml": ["audio_browser.xml", 4044, 97, {}], "player_contol_classic-xml": ["player_contol_classic.xml", 904, 27, {}], "media_info-xml": ["media_info.xml", 2622, 74, {}], "main-xml": ["main.xml", 1524, 40, {}], "audio_browser_item-xml": ["audio_browser_item.xml", 1524, 44, {}], "audio_player_qvga-xml": ["audio_player_qvga.xml", 8079, 219, {}], "vlcwidget-xml": ["vlcwidget.xml", 4701, 125, {}], "notification-xml": ["notification.xml", 2462, 74, {}], "browser-xml": ["browser.xml", 511, 11, {}]}], "layout-land": ["layout-land", 11592, 311, {"media_info-xml": ["media_info.xml", 3108, 84, {}], "audio_player-xml": ["audio_player.xml", 8484, 227, {}]}], "drawable-ldpi": ["drawable-ldpi", 7, 7, {"ic_bookmarks-png": ["ic_bookmarks.png", 1, 1, {}], "icon-png": ["icon.png", 1, 1, {}], "ic_menu_goto-png": ["ic_menu_goto.png", 1, 1, {}], "ic_menu_refresh-png": ["ic_menu_refresh.png", 1, 1, {}], "ic_menu_archive-png": ["ic_menu_archive.png", 1, 1, {}], "ic_menu_search-png": ["ic_menu_search.png", 1, 1, {}], "ic_menu_revert-png": ["ic_menu_revert.png", 1, 1, {}]}], "values-or": ["values-or", 14131, 168, {"strings-xml": ["strings.xml", 14131, 168, {}]}], "values-te": ["values-te", 0, 0, {"strings-xml": ["strings.xml", 0, 0, {}]}], "values-my": ["values-my", 17695, 183, {"strings-xml": ["strings.xml", 17695, 183, {}]}], "values-pl": ["values-pl", 12638, 204, {"strings-xml": ["strings.xml", 12638, 204, {}]}], "values-gl": ["values-gl", 13147, 208, {"strings-xml": ["strings.xml", 13147, 208, {}]}], "values-ko": ["values-ko", 9818, 169, {"strings-xml": ["strings.xml", 9818, 169, {}]}], "values-km": ["values-km", 16940, 183, {"strings-xml": ["strings.xml", 16940, 183, {}]}], "values-th": ["values-th", 17572, 195, {"strings-xml": ["strings.xml", 17572, 195, {}]}], "values-gd": ["values-gd", 14341, 220, {"strings-xml": ["strings.xml", 14341, 220, {}]}], "drawable-xhdpi-v11": ["drawable-xhdpi-v11", 0, 0, {"ic_stat_vlc-png": ["ic_stat_vlc.png", 0, 0, {}]}], "values-is": ["values-is", 12038, 198, {"strings-xml": ["strings.xml", 12038, 198, {}]}], "values-tr": ["values-tr", 12853, 208, {"strings-xml": ["strings.xml", 12853, 208, {}]}], "values-vi": ["values-vi", 14356, 202, {"strings-xml": ["strings.xml", 14356, 202, {}]}], "drawable": ["drawable", 8320, 651, {"ic_stop-xml": ["ic_stop.xml", 516, 7, {}], "background_item-xml": ["background_item.xml", 452, 14, {}], "header_button_focused-png": ["header_button_focused.png", 5, 5, {}], "header_icon_subtitle-png": ["header_icon_subtitle.png", 1, 1, {}], "ic_shuffle-png": ["ic_shuffle.png", 12, 12, {}], "actionbar_background-xml": ["actionbar_background.xml", 169, 4, {}], "header_logo-png": ["header_logo.png", 1, 1, {}], "header-png": ["header.png", 1, 1, {}], "ic_folder-png": ["ic_folder.png", 1, 1, {}], "ic_next-9-png": ["ic_next.9.png", 0, 0, {}], "gridview_progressbar-xml": ["gridview_progressbar.xml", 632, 26, {}], "ic_play_glow-png": ["ic_play_glow.png", 9, 9, {}], "ic_forward_glow-png": ["ic_forward_glow.png", 6, 6, {}], "ic_backward_glow-png": ["ic_backward_glow.png", 6, 6, {}], "ic_forward_normal-png": ["ic_forward_normal.png", 6, 6, {}], "ic_seekbar_thumb-png": ["ic_seekbar_thumb.png", 2, 2, {}], "sleep-png": ["sleep.png", 8, 8, {}], "cone-png": ["cone.png", 204, 204, {}], "sleep_cancel-png": ["sleep_cancel.png", 7, 7, {}], "about_bg-xml": ["about_bg.xml", 332, 9, {}], "ic_play-xml": ["ic_play.xml", 516, 7, {}], "video_list_length_bg-xml": ["video_list_length_bg.xml", 219, 6, {}], "ic_lock_glow-png": ["ic_lock_glow.png", 9, 9, {}], "ic_pause-xml": ["ic_pause.xml", 520, 7, {}], "po_seekbar-xml": ["po_seekbar.xml", 637, 26, {}], "ic_stop_normal-png": ["ic_stop_normal.png", 8, 8, {}], "header_icon_audio-png": ["header_icon_audio.png", 3, 3, {}], "header_button_pressed-png": ["header_button_pressed.png", 4, 4, {}], "header_button-xml": ["header_button.xml", 551, 7, {}], "ic_stop_glow-png": ["ic_stop_glow.png", 7, 7, {}], "header_icon_loupe-png": ["header_icon_loupe.png", 4, 4, {}], "background_pattern_dark-png": ["background_pattern_dark.png", 22, 22, {}], "ic_size_glow-png": ["ic_size_glow.png", 9, 9, {}], "ic_repeat_glow-png": ["ic_repeat_glow.png", 12, 12, {}], "ic_lock-png": ["ic_lock.png", 7, 7, {}], "icon-png": ["icon.png", 2, 2, {}], "ic_pause_glow-png": ["ic_pause_glow.png", 9, 9, {}], "ic_down-png": ["ic_down.png", 1, 1, {}], "ic_size_normal-png": ["ic_size_normal.png", 8, 8, {}], "ic_size-xml": ["ic_size.xml", 516, 7, {}], "wheel_background-xml": ["wheel_background.xml", 470, 16, {}], "background_pattern_dark_repeat-xml": ["background_pattern_dark_repeat.xml", 198, 4, {}], "spacer-png": ["spacer.png", 0, 0, {}], "ic_shuffle_glow-png": ["ic_shuffle_glow.png", 10, 10, {}], "header_button_normal-png": ["header_button_normal.png", 4, 4, {}], "ic_repeat_one-png": ["ic_repeat_one.png", 21, 21, {}], "background-xml": ["background.xml", 395, 16, {}], "ic_backward-xml": ["ic_backward.xml", 532, 7, {}], "progress-xml": ["progress.xml", 679, 23, {}], "ic_pause_normal-png": ["ic_pause_normal.png", 6, 6, {}], "ic_bookmarks-png": ["ic_bookmarks.png", 2, 2, {}], "ic_repeat-png": ["ic_repeat.png", 13, 13, {}], "dots-png": ["dots.png", 1, 1, {}], "ic_forward-xml": ["ic_forward.xml", 528, 7, {}], "ic_up-png": ["ic_up.png", 1, 1, {}], "dropshadow-9-png": ["dropshadow.9.png", 0, 0, {}], "ic_backward_normal-png": ["ic_backward_normal.png", 6, 6, {}], "ic_play_normal-png": ["ic_play_normal.png", 8, 8, {}], "bg_with_shadow-9-png": ["bg_with_shadow.9.png", 0, 0, {}], "header_icon_video-png": ["header_icon_video.png", 7, 7, {}], "thumbnail-png": ["thumbnail.png", 5, 5, {}]}], "values-pt": ["values-pt", 11380, 191, {"strings-xml": ["strings.xml", 11380, 191, {}]}]}], "jni": ["jni", 159727, 4571, {"pthread-once-c": ["pthread-once.c", 3256, 85, {}], "libvlcjni-track-c": ["libvlcjni-track.c", 13363, 365, {}], "pthread-condattr-c": ["pthread-condattr.c", 2185, 71, {}], "vout-c": ["vout.c", 3610, 99, {}], "aout-h": ["aout.h", 1474, 36, {}], "Android-mk": ["Android.mk", 3973, 106, {}], "pthread-rwlocks-c": ["pthread-rwlocks.c", 10337, 365, {}], "libvlcjni-c": ["libvlcjni.c", 22710, 622, {}], "libvlcjni-equalizer-c": ["libvlcjni-equalizer.c", 4332, 121, {}], "aout-c": ["aout.c", 7266, 223, {}], "log-h": ["log.h", 1746, 43, {}], "pipe2-c": ["pipe2.c", 1240, 31, {}], "egl-android-info-txt": ["egl-android-info.txt", 596, 24, {}], "Application-mk": ["Application.mk", 78, 4, {}], "sem-c": ["sem.c", 1910, 52, {}], "thumbnailer-c": ["thumbnailer.c", 10342, 313, {}], "utils-h": ["utils.h", 1887, 45, {}], "libvlcjni-util-c": ["libvlcjni-util.c", 9854, 298, {}], "wchar": ["wchar", 58301, 1637, {"wcswidth-c": ["wcswidth.c", 2282, 58, {}], "wcspbrk-c": ["wcspbrk.c", 1921, 59, {}], "wcslen-c": ["wcslen.c", 1747, 50, {}], "wmemmove-c": ["wmemmove.c", 1788, 45, {}], "wcsxfrm-c": ["wcsxfrm.c", 1997, 58, {}], "wmemchr-c": ["wmemchr.c", 1848, 53, {}], "wcslcat-c": ["wcslcat.c", 2566, 75, {}], "wcstok-c": ["wcstok.c", 2721, 87, {}], "wcsspn-c": ["wcsspn.c", 1890, 61, {}], "wcsrchr-c": ["wcsrchr.c", 1619, 48, {}], "wcschr-c": ["wcschr.c", 1569, 42, {}], "wcsstr-c": ["wcsstr.c", 2276, 64, {}], "wcslcpy-c": ["wcslcpy.c", 2476, 71, {}], "wcscmp-c": ["wcscmp.c", 2206, 57, {}], "wcsncat-c": ["wcsncat.c", 1897, 58, {}], "wcsdup-c": ["wcsdup.c", 1639, 44, {}], "wmemcmp-c": ["wmemcmp.c", 1869, 54, {}], "wmemcpy-c": ["wmemcpy.c", 1808, 45, {}], "wcpcpy-c": ["wcpcpy.c", 1973, 47, {}], "wcsnlen-c": ["wcsnlen.c", 1589, 43, {}], "wcsncasecmp-c": ["wcsncasecmp.c", 1737, 50, {}], "wcscat-c": ["wcscat.c", 1833, 52, {}], "wcsncmp-c": ["wcsncmp.c", 2181, 58, {}], "wcscasecmp-c": ["wcscasecmp.c", 1668, 46, {}], "wcscspn-c": ["wcscspn.c", 1872, 59, {}], "wcpncpy-c": ["wcpncpy.c", 1682, 46, {}], "wcscpy-c": ["wcscpy.c", 1801, 50, {}], "wcscoll-c": ["wcscoll.c", 1719, 40, {}], "wmemset-c": ["wmemset.c", 1805, 52, {}], "wcsncpy-c": ["wcsncpy.c", 2322, 65, {}]}], "eventfd-c": ["eventfd.c", 1267, 31, {}]}], "-classpath": [".classpath", 466, 10, {}], "assets": ["assets", 42984, 738, {"licence-htm": ["licence.htm", 42937, 733, {}], "-gitignore": [".gitignore", 47, 5, {}]}]}];
+
+    window.onload = init_plots;
+    window.onresize = init_plots;
+
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div id="chart">
+            <div id="code_hierarchy_legend">
+                <h2>Project: vlc-android</h2>
+                <p>1508396 characters, 34419 lines of code.</p>
+            </div>
+            <div id="code_hierarchy"></div>
+        </div>
+    </div>
+
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
+</body>
+</html>
