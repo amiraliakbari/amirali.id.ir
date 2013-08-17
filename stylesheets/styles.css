@@ -307,19 +307,16 @@ footer {
     padding: 20px 0 0;
     color: #ccc;
     overflow: hidden;
+    font-size: smaller;
 }
 
-footer a {
-    color: #fff;
-    font-weight: bold;
+footer a, footer a:hover {
+    text-decoration: none;
+    color: #CCCCCC;
 }
 
 footer p {
-    float: left;
-}
-
-footer p + p {
-    float: right;
+    text-align: center;
 }
 
 @media print, screen and (max-width: 740px) {

@@ -1,16 +1,20 @@
-window.lang = new jquery_lang_js();
+if (typeof jquery_lang_js !== 'undefined') {
+    window.lang = new jquery_lang_js();
+}
 
 $(function () {
-    // translation
-    window.lang.run();
+    if (typeof window.lang !== 'undefined') {
+        // translation
+        window.lang.run();
 
-    // language switch-button
-    var $langSel = $('#lang-select');
-    $langSel.bootstrapSwitch('setState', window.lang.currentLang == 'en', true);
-    $langSel.show();
-    $langSel.on('switch-change', function (e, data) {
-        window.lang.change(data.value ? 'en' : 'fa');
-    });
+        // language switch-button
+        var $langSel = $('#lang-select');
+        $langSel.bootstrapSwitch('setState', window.lang.currentLang == 'en', true);
+        $langSel.show();
+        $langSel.on('switch-change', function (e, data) {
+            window.lang.change(data.value ? 'en' : 'fa');
+        });
+    }
 
     // my emails
     var myEmail = 'amiraliakbari';

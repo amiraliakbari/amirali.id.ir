@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{ page.title }}</title>
+    <title>{{ page.title }} - {{ site.name }}</title>
 
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/bootstrap-glyphicons.css">
@@ -18,14 +18,14 @@
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
     <script src="/javascripts/bootstrap-switch.js"></script>
-    <script src="/javascripts/jquery-lang.js"></script>
-    <script src="/javascripts/i18n.fa.js"></script>
+    {{ page.extra_libs }}
+
     <script src="/javascripts/main.js"></script>
 </head>
 <body>
     <div class="wrapper">
     <header class="without-description">
-        <h1 lang="en">{{ site.name }}</h1>
+        <h1 lang="en">{{ page.title }}</h1>
         <div id="lang-select" class="make-switch" data-label-icon="icon-fullscreen"
              data-on="primary" data-off="success" data-on-label="en" data-off-label="فارسی" style="display: none"
              data-text-label="<span style='padding:0' class='glyphicon glyphicon-comment'></span>">
@@ -33,12 +33,14 @@
         </div>
     </header>
 
-    <section>
-        {{ content }}
-    </section>
+<section id="content-section">
+{{ content }}
+</section>
 </div>
 
-<!--<footer></footer>-->
+<footer>
+    <p><span lang="en">Content licensed under</span> <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US">CC BY</a></p>
+</footer>
 
 <!--[if !IE]><script>fixScale(document);</script><![endif]-->
 <script src="/javascripts/respond.js"></script>
