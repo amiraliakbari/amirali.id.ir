@@ -48,13 +48,6 @@ Sample open-source Android projects' analysis results:
  * [Linphone-Android](/projects/loc-analysis/android/linphone-android.html) (42 KLOC)
  * [VLC-Android](/projects/loc-analysis/android/vlc-android.html) (34 KLOC)
 
-Also these sample projects are kindly provided by [Arsh (Amid Rayaneh Sharif)][3] for the analysis:
-
- * [saed](/projects/loc-analysis/arsh/saed.html) (282 KLOC)
- * [rezgh](/projects/loc-analysis/arsh/rezgh.html) (79 KLOC)
- * [helalahmar](/projects/loc-analysis/arsh/helalahmar.html) (58 KLOC)
- * [arshlib\_\_file\_server](/projects/loc-analysis/arsh/arshlib__file_server.html) (52 KLOC)
-
 For the sake of completeness, I must mention that the reports show line-of-code distribution among project's
 sub-folders, and will give some very useful insight into the overall project structure and code organization.
 For better results, some justifications have been done on reporting LOC for specific files (like downloaded
