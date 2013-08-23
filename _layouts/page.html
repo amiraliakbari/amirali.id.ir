@@ -10,19 +10,19 @@
     <link rel="stylesheet" href="/stylesheets/styles.css">
     <link rel="stylesheet" href="/stylesheets/pygment_style_1.css">
     <link rel="stylesheet" href="/static/bootstrap-switch/bootstrap-switch.css">
+    <link rel="stylesheet" href="/static/nprogress/nprogress.css">
 
     <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <script src="/javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
     <script src="http://code.jquery.com/jquery.min.js"></script>
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
-    <script src="/javascripts/bootstrap-switch.js"></script>
-    {{ page.extra_libs }}
-
-    <script src="/javascripts/main.js"></script>
+    <script src="/static/nprogress/nprogress.js"></script>
 </head>
 <body>
+    <script> NProgress.start(); $(function(){NProgress.done();}); </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
+
     <div class="wrapper">
     <header class="without-description">
         <h1 lang="en">{{ page.title }}</h1>
@@ -43,11 +43,14 @@
     <p><span lang="en">Content licensed under</span> <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US">CC BY</a></p>
 </footer>
 
-<!--[if !IE]><script>fixScale(document);</script><![endif]-->
-<script src="/javascripts/respond.js"></script>
-
-<script type="text/javascript">var gaJsHost=(("https:"==document.location.protocol)?"https://ssl.":"http://www.");document.write(unescape("%3Cscript src='"+gaJsHost+"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script>
-<script type="text/javascript">try{var pageTracker=_gat._getTracker("UA-43201065-1");pageTracker._trackPageview();}catch(err){}</script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
+    <script src="/javascripts/bootstrap-switch.js"></script>
+    {{ page.extra_libs }}
+    <script src="/javascripts/main.js"></script>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    <script src="/javascripts/respond.js"></script>
+    <script type="text/javascript">var gaJsHost=(("https:"==document.location.protocol)?"https://ssl.":"http://www.");document.write(unescape("%3Cscript src='"+gaJsHost+"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script>
+    <script type="text/javascript">try{var pageTracker=_gat._getTracker("UA-43201065-1");pageTracker._trackPageview();}catch(err){}</script>
 
 </body>
 </html>
