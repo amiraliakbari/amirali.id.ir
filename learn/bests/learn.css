@@ -1,0 +1,15 @@
+.table-hover > tbody > tr:hover > td {
+    background-color: #EEE;
+}
+
+.table tr th:last-child {
+    width: 60px;
+}
+
+.table tr td span.glyphicon {
+    display: none;
+}
+
+.table tr:hover td span.glyphicon {
+    display: inline-block;
+}

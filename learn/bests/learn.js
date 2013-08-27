@@ -21,6 +21,53 @@ var resources = {
             description: 'One of the best techniques to have class-based OOP behavior in JS',
             notes: "Its OK if you don't understand the implementation code (second code block in the article), the important thing is to be able to use this class defining approach (Class.extend/etc.) in your code, as well as a general understanding of what the implementation code is trying to solve."
         }
+    ],
+    web: [
+        {
+            id:'6.1',
+            section: 'Validation',
+            title: 'Free email validation API for web forms',
+            level: 'Intermediate',
+            importance: 'Useful',
+            links: ['http://blog.mailgun.com/post/free-email-validation-api-for-web-forms/'],
+            description: 'A free web service to precisely validating emails',
+            notes: "Read it to realize why you can't do it yourself!"
+        }
+    ],
+    cs: [
+        {
+            id:'1.1',
+            section: 'Algorithms',
+            title: 'Big-O notation explained...',
+            level: 'Elementary',
+            importance: 'Must Read',
+            links: ['http://justin.abrah.ms/computer-science/big-o-notation-explained.html'],
+            description: '',
+            notes: ""
+        },
+        {
+            id:'1.1',
+            section: 'Algorithms',
+            title: 'Big-O is easy to calculate, if you know how',
+            level: 'Elementary',
+            importance: 'Must Read',
+            links: ['http://justin.abrah.ms/computer-science/how-to-calculate-big-o.html'],
+            description: '',
+            notes: ""
+        }
+    ],
+    ruby: [
+        {
+            id: '1.1',
+            section: 'Syntax',
+            title: 'Rubby Warrior',
+            level: 'Elementary +',
+            importance: 'Interesting',
+            links: ['https://www.bloc.io/ruby-warrior/'],
+            description: 'Learn ruby programming while playing a turned-based game!',
+            notes: ""
+        }
+    ]
 //        {
 //            id:'4.2',
 //            section: 'OOP',
@@ -31,17 +78,35 @@ var resources = {
 //            description: '',
 //            notes: ""
 //        }
-    ]
+};
+
+var layoutData = {
+    js: {
+        name: 'JavaScript'
+    },
+    cs: {
+        name: 'Computer Science'
+    },
+    web: {
+        name: 'Web Programming'
+    },
+    ruby: {
+        name: 'Ruby Language'
+    }
 };
 
 _.templateSettings = {interpolate : /\{\{(.+?)\}\}/g};
-var createRow = _.template('<tr><td>{{id}}</td><td>{{section}}</td><td>{{title}}</td><td>{{level}}</td><td>{{importance}}</td><td>{{linkHtml}}</td></tr>');
+var sectionT = _.template('<h2>{{title}}</h2><table class="table table-hover"><tr><th>ID</th><th>Section</th><th>Name</th><th>Level</th><th>Importance</th><th></th></tr><tbody id="{{id}}-resources"></tbody></table><br/>');
+var createRow = _.template('<tr><td>{{id}}</td><td>{{section}}</td><td title="{{description}}">{{title}}</td><td>{{level}}</td><td>{{importance}}</td><td>{{linkHtml}}</td></tr>');
 var createLink = _.template('<a href="{{href}}" target="_blank">{{title}}</a>');
 $(function(){
     var i, j, rs, r, lang;
     for (lang in resources) {
         if (!resources.hasOwnProperty(lang)) continue;
         rs = resources[lang];
+        if (resources[lang].length > 0) {
+            $('#resources-container').append(sectionT({title: layoutData[lang].name, id: lang}));
+        }
         for (i=0; i<rs.length; i++) {
             r = rs[i];
             r.linkHtml = '';
