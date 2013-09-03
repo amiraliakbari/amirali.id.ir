@@ -304,6 +304,48 @@ var resources = {
             notes: ""
         }
     ],
+    git: [
+        {
+            id:'5.1',
+            section: 'Submodules',
+            title: 'Git Submodules',
+            level: 'Intermidiate',
+            importance: 'Must Read',
+            links: ['http://git-scm.com/book/en/Git-Tools-Submodules'],
+            description: 'A good starting point for git submodules',
+            notes: "If it looks too verbose, try skimming it first"
+        },
+        {
+            id:'5.2.1',
+            section: 'Submodules',
+            title: 'Git Submodules Tutorial',
+            level: 'Intermidiate +',
+            importance: 'Useful',
+            links: ['https://git.wiki.kernel.org/index.php/GitSubmoduleTutorial'],
+            description: 'The kernel.org tutorial, really straightforward, but requires a fair knowledge of git internals',
+            notes: ""
+        },
+        {
+            id:'5.2.2',
+            section: 'Submodules',
+            title: 'Understanding Git Submodules',
+            level: 'Intermidiate +',
+            importance: 'Useful',
+            links: ['http://speirs.org/blog/2009/5/11/understanding-git-submodules.html'],
+            description: 'A detailed overview of git submodules, with a good insight to the internals of submodules',
+            notes: ""
+        },
+        {
+            id:'5.3',
+            section: 'Submodules',
+            title: 'Git Submodules: Core Concept, Workflows And Tips ',
+            level: 'Intermidiate +',
+            importance: 'Very Useful',
+            links: ['http://blogs.atlassian.com/2013/03/git-submodules-workflows-tips/'],
+            description: 'A good overview of common git submodule workflows, can be used as a good cheat-sheet',
+            notes: "Despite the author's opinion, I really like git submodules."
+        }
+    ],
     linux: [
         {
             id: '2',
@@ -365,6 +407,9 @@ var layoutData = {
     },
     django: {
         name: 'Django'
+    },
+    git: {
+        name: 'Git'
     },
     linux: {
         name: 'Linux'
