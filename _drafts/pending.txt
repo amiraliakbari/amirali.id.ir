@@ -1,0 +1,2 @@
+https://help.ubuntu.com/12.04/serverguide/monitoring-overview.html
+http://net.tutsplus.com/tutorials/tools-and-tips/meet-bower-a-package-manager-for-the-web/
