@@ -2,6 +2,16 @@ var resources = {
     js: [
         // 'Inheritance and the Prototype Chain', ['https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain'], 'The basic of JS OOP model, introducing the prototype chain'
         {
+            id:'1.5',
+            section: 'Basics',
+            title: 'Exceptions',
+            level: 'Elementary',
+            importance: 'Must Read',
+            links: ['https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/throw'],
+            description: 'Exceptions are one of the most useful but less-used features of the JS.',
+            notes: ""
+        },
+        {
             id:'4.1',
             section: 'OOP',
             title: 'Working with Objects',
