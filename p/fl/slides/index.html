@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Feature Location</title>
+    
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/reveal.min.css" type="text/css"/>
+    <link rel="stylesheet" href="css/theme/default.css" id="theme">
+    <style>
+        #body body, #body p, #body h1 {
+            direction: rtl;
+            font-family: "B Nazanin", Tahoma, serif;
+            font-size: 42px;
+        }
+
+        #body section h2 {
+            direction: rtl;
+            font-family: "B Jadid";
+            font-size: 56px;
+            margin-bottom: 75px;
+        }
+
+        .reveal section p {
+            text-align: right;
+        }
+        
+        #head p {
+            text-align: center;
+        }
+        
+        #sharif-logo {
+            position: absolute;
+            top: -100px;
+            right: 50px;
+            border: none;
+            background: none;
+            box-shadow: none;
+        }
+        
+        p.sub {
+            margin-right: 50px;
+        }
+        
+        p.sub:before, p.sub2:before {
+            content: "- ";
+        }
+        
+        p.sub2 {
+            margin-right: 100px;
+        }
+        
+
+        #code_hierarchy1_legend, #code_hierarchy2_legend {
+            font-family: Century Gothic, Arial, Helvetica, sans-serif;
+            margin: -30px auto 30px;
+            text-align: center;
+        }
+
+        #code_hierarchy1, #code_hierarchy2 {}
+
+        #chart1, #chart2 {
+            width: 600px;
+            height: 600px;
+            margin: 0 auto;
+        }
+        
+        
+        .node {
+          stroke: #fff;
+          stroke-width: 1.5px;
+        }
+
+        .link {
+          stroke: #999;
+          stroke-opacity: .6;
+        }
+        .graph .legend {
+            text-align: center;
+            font-size: 18px;
+            margin-top: -30px;
+            margin-bottom: 0px;
+        }
+        
+        .slide-number {
+            font: "B Nazanin";
+            font-size: 24px !important;
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body id="body">
+<div class="reveal">
+    <div class="slides">
+        <section id="head">
+            <img src="images/sharif.png" id="sharif-logo" width="150" />
+            
+            <p>بسم الله الرحمن الرحیم</p>
+
+            <br>
+            <br>
+
+            <p>
+                <b>یافتن ویژگی های نرم افزاری در برنامه های اندروید</b>
+            </p>
+
+            <br>
+            <br>
+
+            <p>امیرعلی اکبری</p>
+
+            <p>استاد راهنما: آقای دکتر حیدرنوری<br>
+            </p>
+        </section>
+        <section>
+            <h2>ویژگی های نرم افزاری</h2>
+
+            <p>تعریف ویژگی نرم افزاری</p>
+
+            <p>لزوم تسهیل یافتن ویژگی ها<br>
+            </p>
+
+            <p>اهمیت یافتن ویژگی ها در فرآیند ایجاد نرم افزار</p>
+
+            <p>فرآیندهای مرتبط با یافتن ویژگی</p>
+
+            <p>
+                <br>
+            </p>
+        </section>
+        <section>
+            <h2>روش های یافتن ویژگی</h2>
+
+            <p>دسته بندی روش ها از نظر نوع بررسی کد</p>
+
+            <p class="sub">روش های استاتیک</p>
+
+            <p class="sub">روش های داینامیک</p>
+
+            <p class="sub">روش های متنی و IR</p>
+
+            <p class="sub">روش های مبتنی بر تاریخچه</p>
+
+            <p class="sub">روش های ترکیبی</p>
+        </section>
+        <section>
+            <h2>مقایسه روش ها</h2>
+
+            <p>روش های داینامیک<br>
+            </p>
+
+            <p class="sub">دقت بالای شناخت</p>
+
+            <p class="sub">وابستگی به نوع اجرا و ورودی ها<br>
+            </p>
+
+            <p class="sub">سختی راه اندازی و اجرا</p>
+
+            <p>روش های استاتیک</p>
+
+            <p class="sub">امکان بررسی دقیق اجزای کد</p>
+
+            <p class="sub">نامعلوم بودن برخی خصوصیات قبل از اجرا<br>
+            </p>
+        </section>
+        <section>
+            <h2>ملاک سنجش</h2>
+
+            <p>تعریف های اجزای مسئله</p>
+
+            <p>تعریف ملاک ها</p>
+
+            <p class="sub">دقت</p>
+
+            <p class="sub">بازیابی</p>
+        </section>
+        <section>
+            <h2>سیستم عامل اندروید</h2>
+
+            <p>فراگیری استفاده</p>
+
+            <p>تفاوت های خاص نرم افزارهای اندروید</p>
+
+            <p>لزوم تغییر در روش های معمول یافتن ویژگی</p>
+        </section>
+        <section>
+            <h2>فراگیری سیستم عامل ها</h2>
+            <img src="images/android-timeline.png" />
+        </section>
+        <section>
+            <h2>فراگیری سیستم عامل ها</h2>
+            <img src="images/android-timeline-2.png" />
+        </section>
+        <section>
+            <h2>تطبیق روش های موجود</h2>
+
+            <p>روش اجرای برنامه و ردیابی اجرا</p>
+
+            <p>محدودیت های شبیه سازی</p>
+
+            <p>وجود انواع زبان ها در کد پروژه</p>
+
+            <p>ساختار خاص مربوط به چهارچوب<br>
+            </p>
+        </section>
+        <section>
+            <h2>معماری پیشنهادی تحلیل</h2>
+
+            <p>مستقل بودن انجام تحلیل از نوع ورودی</p>
+
+            <p>دریافت ورودی بر اساس گزارش استاندارد اجرا</p>
+
+            <p>گزارش اولیه خروجی بر حسب خط کد</p>
+
+            <p>انجام بررسی های استاتیک و بهبود نتایج به کمک آن</p>
+        </section>
+        <section>
+            <h2>ویژگی های خاص اندروید</h2>
+
+            <p>بررسی نمونه بر روی چهار نرم افزار</p>
+
+            <p>ویژگی های خاص نرم افزارهای اندروید</p>
+
+            <p class="sub">چهارچوب اندروید</p>
+
+            <p class="sub">انواع زبان های مورد استفاده</p>
+
+            <p class="sub">حجم زیاد فایل های XML</p>
+
+            <p class="sub2">حدود 20 تا 40 درصد کد</p>
+
+            <p class="sub">پشتیبانی چندین دستگاه</p>
+
+            <p class="sub">ویژگی های خاص موبایل</p>
+        </section>
+        <section>
+            <h2>ساختار فایل نمونه</h2>
+            <div id="code_hierarchy1_legend"><b>GitHub Android</b><span></span></div>
+            <div id="chart1">
+                <div id="code_hierarchy1"></div>
+            </div>
+        </section>
+        <section>
+            <h2>ساختار فایل نمونه</h2>
+            <div id="code_hierarchy2_legend"><b>Google MyTracks</b><span></span></div>
+            <div id="chart2">
+                <div id="code_hierarchy2"></div>
+            </div>
+        </section>
+        <section>
+            <h2>گراف وابستگی ها</h2>
+
+            <p>کلاس ها و توابع</p>
+
+            <p>اجزای اصل کارکردی اندروید</p>
+
+            <p>فایل های XML حاوی رابط کاربر</p>
+
+            <p>دسته های مختلف فایل های شامل مقادیر</p>
+        </section>
+        <section>
+            <h2>نمونه گراف وابستگی</h2>
+            <div id="graph1" class="graph">
+                <p class="legend">XML Files Structure</p>
+            </div>
+        </section>
+        <section>
+            <h2>نمونه گراف وابستگی</h2>
+            <div id="graph2" class="graph">
+                <p class="legend">Program Structure</p>
+            </div>
+        </section>
+        <section>
+            <h2>الگوریتم نمایش گراف</h2>
+
+            <p>بر اساس سیستم مصور سازی D3</p>
+
+            <p>با استفاده از شبیه سازی فیزیکی ذرات باردار</p>
+
+            <p>با اضافه کردن پیوندها برای نزدیک کردن اجزای وابسته</p>
+
+            <p>امکان انجام تحلیل بر اساس ظاهر گراف<br>
+            </p>
+        </section>
+        <section>
+            <h2>بررسی های ساختاری</h2>
+            <img src="images/concepts1.png" />
+        </section>
+        <section>
+            <h2>بررسی های ساختاری</h2>
+            <img src="images/concepts.png" />
+        </section>
+        <section>
+            <h2>با تشکر از توجه شما</h2>
+        </section>
+    </div>
+</div>
+<p class="slide-number"></p>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/d3.min.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/reveal.min.js"></script>
+<script type="text/javascript" src="js/charts.js"></script>
+<script type="text/javascript" src="js/graph.js"></script>
+<script type="text/javascript">
+    Reveal.initialize({
+
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable touch events for navigation
+        touch: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: true,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // Transition style
+        transition: 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Transition speed
+        transitionSpeed: 'default', // default/fast/slow
+
+        // Transition style for full page backgrounds
+        backgroundTransition: 'default' // default/linear/none
+
+    });
+    
+    var slideNumber = document.querySelector('.slide-number');
+    var updateSlideNumber = function(event) {
+        var textContent = event.indexh;
+        if (event.indexv > 0) {
+            textContent += '-' + event.indexv;
+        }
+        if (event.indexh > 0) {
+            slideNumber.textContent = textContent;
+        }
+    }
+    Reveal.addEventListener('ready', updateSlideNumber);
+    Reveal.addEventListener('slidechanged', updateSlideNumber);
+    
+$(function(){
+    makeGraph('#graph2', graphData1, 500, 400);
+    makeGraph('#graph1', graphData2, 600, 500);
+    init_code_hierarchy_plot("code_hierarchy1", code_hierarchy_data1);
+    init_code_hierarchy_plot("code_hierarchy2", code_hierarchy_data2);
+    $('.graph .node').mouseenter(function(){
+        $(this).closest('.graph').find('.legend').text($(this).find('title').text());
+    });
+});
+</script>
+</body>
