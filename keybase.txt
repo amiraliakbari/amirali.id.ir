@@ -1,0 +1,58 @@
+==================================================================
+https://keybase.io/amirali
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://amirali.id.ir
+  * I am amirali (https://keybase.io/amirali) on keybase.
+  * I have a public key with fingerprint 47DA E005 89F3 48B4 5117  AA39 1AB5 34E1 38A7 06D1
+
+To claim this, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "fingerprint": "47dae00589f348b45117aa391ab534e138a706d1",
+            "host": "keybase.io",
+            "key_id": "1ab534e138a706d1",
+            "uid": "22faec757862b431d72d8b287c08fd00",
+            "username": "amirali"
+        },
+        "service": {
+            "hostname": "amirali.id.ir",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1411458349,
+    "expire_in": 157680000,
+    "prev": "72a49961f30f54a374e6442498aee095dacd0fa7fde950752c14cd558b9ba824",
+    "seqno": 5,
+    "tag": "signature"
+}
+
+with the aforementioned key, yielding the PGP signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1
+
+owFtkTFrFEEUx9eLOUhAMKCNnQOxOo6Z3ZmdmQUhFuYTpDlBjjc7by+Dl911dnNn
+COktU1oIWkVjL4qVkNJKsLBU/AKS1IIzQQvBaR7z3u//f+/xjq+tJIONW2/5d/Vq
++PnKp4/nJtm5vXn3kJjGHpDikDzCy1C5eoa+9a7uSUG4tICUCqWrjCvDBWMSINMM
+jMg4skyBpLllZER2my4qgo2BDseuCbnwmTobsv/h9y8LaVoBllJIlaeGZ8zK1CqT
+KllSVVlKI9ihr2EPAw17zsPckaMRCcmFKzGOHDv/C4ydHTsftK1v+qZs5qG02/dt
+EZX9QRvRJZrpH5OpcbUNewfBAn3nmpoULJBl76Ir44xxoTKuRwSftM7j1EVCyFzR
+8GIbXARLmQLXOmdVRivBIZMcc85TrhUgUi0slJZWICuLWlAp0pLx0gqhjDagUk7i
+Wo/rhhQijAmzYNm5WQ39vkdytP50+2qyMUiGq4N4uWR97frfez5cJi/uXZz8nPxa
+/Xrn9LW+sfVh7cfk24Pk5Zmfv7u5zFfebw4vnk2en725/+X8Nw==
+=1IGt
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/amirali
+
+==================================================================
