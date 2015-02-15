@@ -379,7 +379,7 @@ footer p {
 /*****************
  *  Accounts Bar *
  *****************/
-#accounts-div {
+.showcase {
     margin: -10px auto 0;
     width: 400px;
     height: 60px;
@@ -388,14 +388,17 @@ footer p {
     text-align: center;
 }
 
-#accounts-div a {
+.showcase .item {
     display: inline-block;
     width: 48px;
     height: 48px;
+    font-size: 44px;
+    cursor: pointer;
+    color: #000;
 }
 
-#ico-gmail {
-    background-image: url('../images/gmail-48.png');
+.showcase .item:hover {
+  text-decoration: none;
 }
 
 #ico-arsh {
@@ -451,4 +454,10 @@ footer p {
 
 .lang.lang-active, .lang.en-only {
   display: inline-block;
+}
+
+#item-details {
+  margin-top: 15px;
+  text-align: center;
+  height: 45px;
 }
