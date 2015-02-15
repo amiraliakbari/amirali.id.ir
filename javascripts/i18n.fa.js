@@ -1,5 +1,6 @@
 jquery_lang_js.prototype.lang.fa = {
     'AmirAli Akbari': 'امیرعلی اکبری',
+    'Highlights': 'برگزیده‌ها',
     'Latest': 'آخرین مطالب',
     '[Aug 18]': '[۲۷ مرداد]',
     '[Aug 23]': '[1 شهریور]',

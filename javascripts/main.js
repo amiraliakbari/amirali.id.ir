@@ -12,7 +12,10 @@ $(function () {
         $langSel.bootstrapSwitch('setState', window.lang.currentLang == 'en', true);
         $langSel.show();
         $langSel.on('switch-change', function (e, data) {
-            window.lang.change(data.value ? 'en' : 'fa');
+            var clang = data.value ? 'en' : 'fa';
+            window.lang.change(clang);
+            $('.lang').removeClass('lang-active').addClass('lang-unactive');
+            $('.' + clang + '-only').removeClass('lang-unactive').addClass('lang-active');
         });
     }
 

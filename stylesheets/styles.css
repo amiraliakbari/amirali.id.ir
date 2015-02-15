@@ -444,3 +444,11 @@ footer p {
     top: 50px;
     cursor: pointer;
 }
+
+.lang, .lang.en-only.lang-unactive {
+  display: none;
+}
+
+.lang.lang-active, .lang.en-only {
+  display: inline-block;
+}
