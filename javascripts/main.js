@@ -49,3 +49,32 @@ $(function () {
         $('#item-details').html(window.lang.currentLang == 'en' ? '<p>for more information on each item, move mouse over it, and click to view.</p>' : '<p>برای اطلاعات بیشتر موس را روی هر گزینه ببرید، و برای ورود روی آن کلیک کنید.</p>');
     });
 });
+
+var fbase;
+
+function authCallback (data) {
+    var name;
+    if (!data) {
+        $('#login-button').show();
+        name = 'Anonymous';
+    } else {
+        $('#login-button').hide();
+        name = data.google.displayName;
+    }
+    $('#username').text(name);
+}
+
+$(function () {
+    fbase = new Firebase("https://glaring-fire-7735.firebaseio.com");
+
+    $('#login-button').click(function () {
+        fbase.authWithOAuthRedirect("google", function(error) {
+            if (error) {
+                console.log("Login Failed!", error);
+            } else {
+            }
+        });
+    });
+
+    fbase.onAuth(authCallback);
+});
