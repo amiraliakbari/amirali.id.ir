@@ -35,11 +35,13 @@ $(function () {
     var pDetails = {};
     pDetails.en = {
         learn: "A collection of best programming articles that anyone must read",
-        fl: "My BSc project: Feature Location in Android Applications"
+        fl: "My BSc project: Feature Location in Android Applications",
+        almizan: "Almizan Quran Tafsir (Farsi)"
     };
     pDetails.fa = {
         learn: "مجموعه‌ای از بهترین مقالات مرتبط با بارنامه‌نویسی که هر کسی باید بخواند",
-        fl: "پروژه‌ی کارشناسی من: یافتن ویژگی‌های نرم‌افزاری در برنامه‌های اندروید"
+        fl: "پروژه‌ی کارشناسی من: یافتن ویژگی‌های نرم‌افزاری در برنامه‌های اندروید",
+        almizan: "نسخه‌ای آنلاین از تفسیر المیزان برای دسترسی و مطالعه‌ی ساده‌تر"
     };
     $('#projects-div.showcase .item').mouseenter(function () {
         var t = pDetails[window.lang.currentLang][$(this).data('pid')] || '';

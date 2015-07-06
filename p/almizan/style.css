@@ -12,6 +12,18 @@
   font-weight: 700;
 }
 
+@font-face {
+  font-family: 'Neirizi';
+  src: url('/fonts/neirizi.eot');
+  src: url('/fonts/neirizi.eot?#iefix') format('embedded-opentype'),
+  url('/fonts/neirizi.woff2') format('woff2'),
+  url('/fonts/neirizi.woff') format('woff'),
+  url('/fonts/neirizi.ttf') format('truetype'),
+  url('/fonts/neirizi.svg#neirizi') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   direction: rtl;
   overflow: hidden;
@@ -36,12 +48,12 @@ body, div, p, span, ul, li, h1, h2, h3, h4, h5, h6 {
 }
 
 #text-ar span {
-  font-family: Neirizi, QuranTaha, WebIran;
+  font-family: Neirizi, QuranTaha, WebIran, Tahoma, serif;
   font-size: 24px;
 }
 
 #text-ar span.badge {
-  font-family: BNazanin, WebIran;
+  font-family: BNazanin, WebIran, Tahoma, serif;;
   font-size: 16px;
 }
 
@@ -59,4 +71,16 @@ body, div, p, span, ul, li, h1, h2, h3, h4, h5, h6 {
   font-size: 18px;
   text-align: justify;
   line-height: 2.5;
+}
+
+#toolbar-bottom {
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  background-color: white;
+  padding: 3px;
+}
+
+#toolbar-bottom .btn {
+  border-radius: 50%;
 }
