@@ -1,0 +1,62 @@
+@font-face {
+  font-family: WebIran;
+  src: url(/fonts/Iran.eot);
+  src: url(/fonts/Iran.eot?#iefix) format("embedded-opentype"), url(/fonts/Iran.woff) format("woff"), url(/fonts/Iran.ttf) format("truetype"), url(/fonts/Iran.svg) format("svg");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: WebIran;
+  src: url(/fonts/IranBold.eot);
+  src: url(/fonts/IranBold.eot?#iefix) format("embedded-opentype"), url(/fonts/IranBold.woff) format("woff"), url(/fonts/IranBold.ttf) format("truetype"), url(/fonts/IrnBold.svg) format("svg");
+  font-weight: 700;
+}
+
+body {
+  direction: rtl;
+  overflow: hidden;
+  padding: 10px 5px 5px 0;
+}
+
+body, div, p, span, ul, li, h1, h2, h3, h4, h5, h6 {
+  font-family: WebIran, BNazanin, Tahoma, serif;
+}
+
+#top-nav {
+  margin-top: 5px;
+}
+
+#top-nav h1 {
+  margin-top: 0;
+  margin-right: 20px;
+}
+
+#text-ar {
+  margin: 30px 20px 30px 10px;
+}
+
+#text-ar span {
+  font-family: Neirizi, QuranTaha, WebIran;
+  font-size: 24px;
+}
+
+#text-ar span.badge {
+  font-family: BNazanin, WebIran;
+  font-size: 16px;
+}
+
+#text {
+  position: relative;
+  height: 400px;
+  overflow-y: scroll;
+}
+
+#text > div {
+  margin: 25px 25px;
+}
+
+#text > div > p {
+  font-size: 18px;
+  text-align: justify;
+  line-height: 2.5;
+}
