@@ -19,6 +19,8 @@ University of Technology, I am trying to design and implement specific feature l
 algorithms for Android projects. The work on the project is currently in progress, but I am looking forward
 to publishing further results on the project soon.
 
+Update: the <a href="/p/fl/slides/" target="_blank">thesis slides</a> are now available.
+
 
 ### Sub-Projects
 
