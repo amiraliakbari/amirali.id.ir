@@ -1,7 +1,7 @@
 {
-  "id": "-",
-  "chapter": "",
-  "section": "",
+  "id": "1-2",
+  "chapter": "سوره حمد",
+  "section": "آیات ۶-۷",
   "verses": [
     "",
     ""
@@ -10,7 +10,7 @@
     "",
     ""
   ],
-  "versesOffset": 0,
+  "versesOffset": 6,
   "subsections": [
     {
       "title": "",
@@ -20,5 +20,6 @@
       "title": "",
       "text": ""
     }
-  ]
+  ],
+  "eos": true
 }
