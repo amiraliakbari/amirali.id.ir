@@ -1,7 +1,9 @@
 var almizaan = {
     chapterId: 0,
     sectionId: 0,
-    subsectionId: 0
+    subsectionId: 0,
+    prevSection: -1,
+    eos: false
 };
 
 function fixSizing() {
@@ -31,6 +33,9 @@ function loadSection(chapterId, sectionId) {
     if (almizaan.chapterId === chapterId && almizaan.sectionId == sectionId) {
         return;
     }
+    if (chapterId < 0 || chapterId > 114) {
+        return;
+    }
 
     var id = chapterId + '-' + sectionId;
     NProgress.start();
@@ -45,8 +50,11 @@ function loadSection(chapterId, sectionId) {
             var verses = '';
             for (i = 0; i < r.verses.length; i++) {
                 var v = r.verses[i];
-                verses += '<span>' + v + ' <span class="badge">' + toPersianNumber(r.versesOffset + i)
-                    + '</span></span>&nbsp;&nbsp;';
+                verses += '<span>' + v;
+                if (r.versesOffset) {
+                    verses += ' <span class="badge">' + toPersianNumber(r.versesOffset + i) + '</span>';
+                }
+                verses += '</span>&nbsp;&nbsp;';
             }
             $('#text-ar').html(verses);
 
@@ -63,6 +71,8 @@ function loadSection(chapterId, sectionId) {
 
             almizaan.chapterId = chapterId;
             almizaan.sectionId = sectionId;
+            almizaan.eos = !!(r.eos);
+            almizaan.prevSection = r.prevSection || -1;
             window.location.href = '#g' + chapterId + '-' + sectionId;
         })
         .fail(function () {
@@ -77,15 +87,20 @@ function loadPrevSection() {
     var s = almizaan.sectionId - 1;
     var c = almizaan.chapterId;
     if (s === 0) {
-        s = 1;  // TODO: how to get last section of previous chapter?
+        s = almizaan.prevSection || 1;
         c -= 1;
     }
     loadSection(c, s);
 }
 
 function loadNextSection() {
-    // TODO: check for end of chapter
-    loadSection(almizaan.chapterId, almizaan.sectionId + 1);
+    var s = almizaan.sectionId + 1;
+    var c = almizaan.chapterId;
+    if (almizaan.eos) {
+        s = 1;
+        c += 1;
+    }
+    loadSection(c, s);
 }
 
 $(function () {
@@ -95,4 +110,9 @@ $(function () {
     $(window).on('hashchange', listenForHash);
     $('#prevSectionBtn').click(function () {loadPrevSection()});
     $('#nextSectionBtn').click(function () {loadNextSection()});
+
+    var h = window.location.hash;
+    if (h === '' || h === '#' || h.substr(0, 2) !== '#g') {
+        loadSection(0, 1);
+    }
 });
