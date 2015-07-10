@@ -7,7 +7,10 @@ var almizaan = {
 };
 
 function fixSizing() {
-    $('#text').height(window.innerHeight - $('#window').position().top - 5);
+    var wTop = $('#window').position().top;
+    var toolbarH = $('#toolbar-bottom').height();
+    $('#text').height(window.innerHeight - wTop - 5);
+    $('#sections-nav').height(window.innerHeight - wTop - toolbarH - 5);
 }
 
 function listenForHash() {
