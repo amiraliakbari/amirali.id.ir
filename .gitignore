@@ -1,5 +1,7 @@
 /.idea/*
-/_site/*
 *.xcf
 *~
 .*.swp
+
+/_site/*
+.jekyll-metadata

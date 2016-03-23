@@ -1,5 +1,5 @@
 name: AmirAli Akbari
-markdown: redcarpet
+markdown: kramdown
 highlighter: rouge
 timezone: Asia/Tehran
 permalink: /blog/:year/:title
