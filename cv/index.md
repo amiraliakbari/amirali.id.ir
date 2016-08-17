@@ -1,6 +1,7 @@
 ---
 layout: page
-title:  "CV: AmirAli Akbari"
+title:  "My CV: AmirAli Akbari"
+description: "Technical Consulting, System Analysis & Architecture, Product Design, Web Development, Server Management, Cloud Adoption"
 ---
 
 <br/>
