@@ -69,6 +69,8 @@ function authCallback (data) {
 }
 
 $(function () {
+    $('#login-button').hide();
+    return;
     fbase = new Firebase("https://glaring-fire-7735.firebaseio.com");
 
     $('#login-button').click(function () {

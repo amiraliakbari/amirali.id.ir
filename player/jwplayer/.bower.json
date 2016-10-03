@@ -1,0 +1,33 @@
+{
+  "name": "jwplayer",
+  "version": "7.3.5",
+  "authors": [
+    "Bian Jiaping <ssbianjp@gmail.com>"
+  ],
+  "description": "JW Player bower wrapper",
+  "main": [
+    "dist/jwplayer.js",
+    "dist/skins/five.css",
+    "dist/jwplayer.flash.swf"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/bianjp/jwplayer",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "tmp",
+    "build.sh",
+    "package.json"
+  ],
+  "_release": "7.3.5",
+  "_resolution": {
+    "type": "version",
+    "tag": "v7.3.5",
+    "commit": "541c4a3a825182fb5092fe3f2ffe42c21a5090b6"
+  },
+  "_source": "git://github.com/bianjp/jwplayer.git",
+  "_target": "^7.3.5",
+  "_originalSource": "bianjp/jwplayer",
+  "_direct": true
+}
