@@ -50,7 +50,8 @@ $(function () {
         $('#item-details').html('<p>' + t + '</p>');
     });
     $('#projects-div.showcase').mouseleave(function () {
-        $('#item-details').html(window.lang.currentLang == 'en' ? '<p>for more information on each item, move mouse over it, and click to view.</p>' : '<p>برای اطلاعات بیشتر موس را روی هر گزینه ببرید، و برای ورود روی آن کلیک کنید.</p>');
+        var is_en = (typeof window.lang === 'undefined') || (window.lang.currentLang == 'en');
+        $('#item-details').html(is_en ? '<p>for more information on each item, move mouse over it, and click to view.</p>' : '<p>برای اطلاعات بیشتر موس را روی هر گزینه ببرید، و برای ورود روی آن کلیک کنید.</p>');
     });
 });
 
