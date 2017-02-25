@@ -6,7 +6,7 @@
     <title>{{ page.title }}</title>
 
     <link rel="icon" type="image/png" href="/images/amirali.png">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/styles.css">
     <link rel="stylesheet" href="/static/nprogress/nprogress.css">
 
@@ -17,15 +17,15 @@
     <meta property="og:description" content="{{ page.description }}" />
     <meta property="og:image" content="/images/amirali.png" />
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.1.6/nprogress.min.js"></script>
+    <script src="/lib/nprogress/nprogress.js"></script>
 </head>
 <body>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script> NProgress.start() </script>
     <link rel="stylesheet" href="/stylesheets/pygment_style_1.css">
     <link rel="stylesheet" href="/static/bootstrap-switch/bootstrap-switch.css">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+    <script src="/lib/underscore/underscore-min.js"></script>
 
     <div class="wrapper">
     <header class="without-description">
@@ -49,19 +49,17 @@
     <p><span lang="en">Content licensed under</span> <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US">CC BY</a></p>
 </footer>
 
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="/javascripts/bootstrap-switch.js"></script>
-    <!--<script src="//cdn.firebase.com/js/client/2.2.0/firebase.js"></script>-->
     {{ page.extra_libs }}
     <script src="/javascripts/main.js"></script>
 
     <!-- fixes, shims and stats -->
     <script>fixScale=function(e){function t(){r.content="width=device-width,minimum-scale="+m[0]+",maximum-scale="+m[1],e.removeEventListener(i,t,!0)}var n="addEventListener",i="gesturestart",a="querySelectorAll",m=[1,1],r=a in e?e[a]("meta[name=viewport]"):[];(r=r[r.length-1])&&n in e&&(t(),m=[.25,1.6],e[n](i,t,!0))};</script>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    <!--[if IE]><script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script><![endif]-->
     <script type="text/javascript">var gaJsHost=(("https:"==document.location.protocol)?"https://ssl.":"http://www.");document.write(unescape("%3Cscript src='"+gaJsHost+"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script>
     <script type="text/javascript">try{var pageTracker=_gat._getTracker("UA-43201065-1");pageTracker._trackPageview();}catch(err){}</script>
     <script> NProgress.done() </script>
-
 </body>
 </html>
