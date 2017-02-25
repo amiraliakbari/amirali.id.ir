@@ -2,6 +2,12 @@ if (typeof jquery_lang_js !== 'undefined') {
     window.lang = new jquery_lang_js();
 }
 
+function getLang() {
+    if (typeof window.lang == 'undefined')
+        return 'en';
+    return window.lang.currentLang;
+}
+
 function updateLang () {
     $('#item-details').html('<p class="lang en-only">for more information on each item, move mouse over it, and click to view.</p><p class="lang fa-only">برای اطلاعات بیشتر موس را روی هر گزینه ببرید، و برای ورود روی آن کلیک کنید.</p>');
     $('.lang').removeClass('lang-active').addClass('lang-unactive');
@@ -46,11 +52,11 @@ $(function () {
         almizan: "نسخه‌ای آنلاین از تفسیر المیزان برای دسترسی و مطالعه‌ی ساده‌تر"
     };
     $('#projects-div.showcase .item').mouseenter(function () {
-        var t = pDetails[window.lang.currentLang][$(this).data('pid')] || '';
+        var t = pDetails[getLang()][$(this).data('pid')] || '';
         $('#item-details').html('<p>' + t + '</p>');
     });
     $('#projects-div.showcase').mouseleave(function () {
-        var is_en = (typeof window.lang === 'undefined') || (window.lang.currentLang == 'en');
+        var is_en = getLang() == 'en';
         $('#item-details').html(is_en ? '<p>for more information on each item, move mouse over it, and click to view.</p>' : '<p>برای اطلاعات بیشتر موس را روی هر گزینه ببرید، و برای ورود روی آن کلیک کنید.</p>');
     });
 });
@@ -71,8 +77,7 @@ function authCallback (data) {
 
 $(function () {
     $('#login-button').hide();
-    return;
-    fbase = new Firebase("https://glaring-fire-7735.firebaseio.com");
+    /*fbase = new Firebase("https://glaring-fire-7735.firebaseio.com");
 
     $('#login-button').click(function () {
         fbase.authWithOAuthRedirect("google", function(error) {
@@ -83,5 +88,5 @@ $(function () {
         });
     });
 
-    fbase.onAuth(authCallback);
+    fbase.onAuth(authCallback);*/
 });

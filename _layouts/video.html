@@ -10,32 +10,35 @@ layout: page
 <div>
     <div id="player" class="center">در حال بارگزاری پخش کننده...</div>
 </div>
-<script type="text/javascript" src="../jwplayer/dist/jwplayer.js"></script>
+<script type="text/javascript" src="/javascripts/jwplayer791.js"></script>
 <script type="text/javascript">
     var player;
 
     function setupPlayer() {
         if (!player) {
             if (typeof jwplayer !== 'undefined') {
-                jwplayer.key = "olrKKZfGLAB894ClZKwJ+Pd29CElpZ2kuqlnjA==";
                 player = jwplayer("player");
             } else {
                 return;
             }
+        }
+        var vmapUrl = 'https://s.vidad.net/vmap/lV4vbCS9/{{ page.vmap }}?vpaid=yes{{ page.vparams }}';
+        if (window.location.hostname == 'localhost') {
+            vmapUrl = 'http://127.0.0.1:8000/vmap/lV4vbCS9/{{ page.vmap }}?vpaid=yes{{ page.vparams }}';
         }
         player.setup({
             file: "../videos/{{ page.video }}",
             aspectratio: "16:9",
             width: "720",
             height: "480",
-            plugins: {
-                "https://bin.player.qmery.com/stable/plugins/vidadads.js": {},
-            },
             advertising: {
-                schedule: "{{ page.vmap }}",
-                admessage: "پیام",
-                cuetext: "آگهی بازرگانی",
-                loadOnTime: true
+                client: 'vast',
+                schedule: vmapUrl,
+                vpaidmode:"enabled",
+                admessage:"XX ثانیه تا پایان آگهی بازرگانی ",
+                skipmessage:"ثانیه XX",
+                skiptext:"رد کردن",
+                cuetext:"آگهی بازرگانی"
             }
         });
     }
