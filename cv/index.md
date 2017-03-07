@@ -13,6 +13,9 @@ description: "Technical Consulting, System Analysis & Architecture, Product Desi
 
 ## Work Experience
 
+* VidAd, **Technical Lead**, Sep 2016 - Present
+* Sharif University, **Invited Lecturer**, Feb 2017 - Present
+* Emad Rayaneh Sharif, **Technical Lead**, Jan 2017 - Present
 * Arsh, **Technical Consultant**, Jan 2016 - Present
 * Arsh, **CTO**, Sep 2013 - Dec 2015
 * Arsh, **Server Manager & DevOps**, Sep 2012 - Dec 2015 _[Overlapping]_
@@ -22,6 +25,7 @@ description: "Technical Consulting, System Analysis & Architecture, Product Desi
 
 ## Notable Work Projects
 
+* **[VidAd][4]** Video Advertisement Platform
 * **[Fractaal][1]:** Distributed system for crawling social media & handling the large volume of gathered data, featuring visualization and data mining over
    Big Data
 * **[Simap][2]:** Automated rating & evaluation system for university professors based on published articles & university regulations
@@ -37,6 +41,7 @@ description: "Technical Consulting, System Analysis & Architecture, Product Desi
 [3]:https://badoom.ir
 [4]:https://getgrapefruit.ir
 [5]:http://helalahmar.arsh.co
+[6]:http://vidad.net
 
 <br/><br/>
 
