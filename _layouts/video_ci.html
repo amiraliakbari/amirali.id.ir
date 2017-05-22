@@ -1,0 +1,49 @@
+---
+layout: page
+---
+
+<style>
+    #player {
+        margin: 0 auto;
+    }
+</style>
+<div>
+    <div id="player" class="center">در حال بارگزاری پخش کننده...</div>
+</div>
+<script type="text/javascript" src="https://player.vidad.net/player.js"></script>
+<script type="text/javascript">
+    var player;
+
+    function setupPlayer() {
+        if (!player) {
+            if (typeof jwplayer !== 'undefined') {
+                player = jwplayer("player");
+            } else {
+                return;
+            }
+        }
+        var vmapUrl = 'http://api.ci.vidad.net/vmap/lV4vbCS9/{{ page.vmap }}?vpaid=yes&staging=yes{{ page.vparams }}';
+        if (window.location.hostname == 'localhost') {
+            vmapUrl = 'http://127.0.0.1:8000/vmap/lV4vbCS9/{{ page.vmap }}?vpaid=yes&staging=yes{{ page.vparams }}';
+        }
+        player.setup({
+            file: "../videos/{{ page.video }}",
+            aspectratio: "16:9",
+            width: "720",
+            height: "405",
+            advertising: {
+                client: 'vast',
+                schedule: vmapUrl,
+                vpaidmode:"enabled",
+                admessage:"XX ثانیه تا پایان آگهی بازرگانی ",
+                skipmessage:"ثانیه XX",
+                skiptext:"رد کردن",
+                cuetext:"آگهی بازرگانی"
+            }
+        });
+    }
+
+    $(function() {
+        setupPlayer();
+    });
+</script>
