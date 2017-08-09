@@ -1,0 +1,28 @@
+---
+layout: note
+title: Virtualization
+---
+
+## Terminology
+
+
+## Tasks
+
+* [How do I mount a qcow2 disk image?](https://askubuntu.com/q/4396/79344)
+* [Port Forwarding from Host to Guest with libvirt using KVM](https://serverfault.com/a/338511/127341)
+
+### VM console over ssh
+
+```
+virt-viewer --connect qemu+ssh://HOST/system VM
+```
+
+Where `HOST` is the ssh remote host (preferably configured in ssh_config), and `VM` is the name of
+the vm as defined in virsh.
+
+
+## Examples
+
+
+## References
+

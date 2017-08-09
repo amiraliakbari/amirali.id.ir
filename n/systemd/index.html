@@ -1,0 +1,29 @@
+---
+layout: note
+title: SystemD
+---
+
+## Terminology
+
+
+## Tasks
+
+* `systemctl action x.service`
+* `systemctl daemon-reload`
+
+### Adding Unit Files
+
+* `/etc/systemd/system` is reserved for admin units.
+* Unit related directories:
+    *`.d`: for additional configurations and customizations,
+    * `.wants`, `.requires`: symlinks to dependency units
+
+
+## Examples
+
+
+## References
+
+* [SystemD Unit Files](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/sect-Managing_Services_with_systemd-Unit_Files.html)
+* https://www.freedesktop.org/software/systemd/man/systemd.service.html
+* https://www.freedesktop.org/software/systemd/man/systemd.exec.html
