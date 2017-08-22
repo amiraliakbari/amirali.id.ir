@@ -17,6 +17,12 @@ title: Virtualization
 virt-viewer --connect qemu+ssh://HOST/system VM
 ```
 
+### Create new VM
+
+```
+vmbuilder kvm ubuntu --suite=trusty --flavour=virtual --arch=amd64 -o --libvirt=qemu:///system --ip=192.168.122.102 --gw=192.168.122.1 --part=/var/lib/libvirt/images/std/mini.partition --templates=mytemplates --user=amirali --name=amirali --pass=amirali --addpkg=linux-image-generic --addpkg=unattended-upgrades --addpkg=acpid --addpkg=avahi-daemon --addpkg=vim --addpkg=htop --addpkg=git --addpkg=python-virtualenv --firstboot=/var/lib/libvirt/images/std/firstboot.sh --mem=6000 --hostname=news1 --network=default
+```
+
 Where `HOST` is the ssh remote host (preferably configured in ssh_config), and `VM` is the name of
 the vm as defined in virsh.
 

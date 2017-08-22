@@ -29,16 +29,11 @@ layout: page
         player.setup({
             file: "../videos/{{ page.video }}",
             aspectratio: "16:9",
-            width: "720",
-            height: "405",
+            width: "100%",
             advertising: {
                 client: 'vast',
                 schedule: vmapUrl,
                 vpaidmode:"enabled",
-                admessage:"XX ثانیه تا پایان آگهی بازرگانی ",
-                skipmessage:"ثانیه XX",
-                skiptext:"رد کردن",
-                cuetext:"آگهی بازرگانی"
             }
         });
     }
