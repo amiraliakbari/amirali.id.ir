@@ -1,9 +1,5 @@
-/.idea/*
-*.xcf
 *~
 .*.swp
+*.xcf
 
-/_site/*
-.jekyll-metadata
-
-/lib/
+public
