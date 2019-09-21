@@ -1,0 +1,55 @@
+==================================================================
+https://keybase.io/amirali
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://amirali.id.ir
+  * I am amirali (https://keybase.io/amirali) on keybase.
+  * I have a public key ASAt67tVKyA6SZOfPurVv0F7SS0j9Qo7kQlOhmfcNiPv9go
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "01202debbb552b203a49939f3eead5bf417b492d23f50a3b91094e8667dc3623eff60a",
+      "host": "keybase.io",
+      "kid": "01202debbb552b203a49939f3eead5bf417b492d23f50a3b91094e8667dc3623eff60a",
+      "uid": "22faec757862b431d72d8b287c08fd00",
+      "username": "amirali"
+    },
+    "merkle_root": {
+      "ctime": 1511605126,
+      "hash": "91d32ea4ddb6c65379ff988958bf8de253adaa8d69c2b05f5e366ba2d0ba79dd88bd0a89c0eb2d0a4000d15f626932f58db1be68fce0d7f47aab608fe41850cd",
+      "hash_meta": "34621f681432078832393f32a660cd18ab7fd31079a9a44861c6e194d6f36bc8",
+      "seqno": 1746416
+    },
+    "service": {
+      "hostname": "amirali.id.ir",
+      "protocol": "http:"
+    },
+    "type": "web_service_binding",
+    "version": 1
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "1.0.36"
+  },
+  "ctime": 1511605190,
+  "expire_in": 504576000,
+  "prev": "c9aa9d7a1b1d774eb1a838bb360fafce8808f08aab9e1311e2448a75acd40a4d",
+  "seqno": 11,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgLeu7VSsgOkmTnz7q1b9Be0ktI/UKO5EJToZn3DYj7/YKp3BheWxvYWTFA0R7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTIwMmRlYmJiNTUyYjIwM2E0OTkzOWYzZWVhZDViZjQxN2I0OTJkMjNmNTBhM2I5MTA5NGU4NjY3ZGMzNjIzZWZmNjBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwMmRlYmJiNTUyYjIwM2E0OTkzOWYzZWVhZDViZjQxN2I0OTJkMjNmNTBhM2I5MTA5NGU4NjY3ZGMzNjIzZWZmNjBhIiwidWlkIjoiMjJmYWVjNzU3ODYyYjQzMWQ3MmQ4YjI4N2MwOGZkMDAiLCJ1c2VybmFtZSI6ImFtaXJhbGkifSwibWVya2xlX3Jvb3QiOnsiY3RpbWUiOjE1MTE2MDUxMjYsImhhc2giOiI5MWQzMmVhNGRkYjZjNjUzNzlmZjk4ODk1OGJmOGRlMjUzYWRhYThkNjljMmIwNWY1ZTM2NmJhMmQwYmE3OWRkODhiZDBhODljMGViMmQwYTQwMDBkMTVmNjI2OTMyZjU4ZGIxYmU2OGZjZTBkN2Y0N2FhYjYwOGZlNDE4NTBjZCIsImhhc2hfbWV0YSI6IjM0NjIxZjY4MTQzMjA3ODgzMjM5M2YzMmE2NjBjZDE4YWI3ZmQzMTA3OWE5YTQ0ODYxYzZlMTk0ZDZmMzZiYzgiLCJzZXFubyI6MTc0NjQxNn0sInNlcnZpY2UiOnsiaG9zdG5hbWUiOiJhbWlyYWxpLmlkLmlyIiwicHJvdG9jb2wiOiJodHRwOiJ9LCJ0eXBlIjoid2ViX3NlcnZpY2VfYmluZGluZyIsInZlcnNpb24iOjF9LCJjbGllbnQiOnsibmFtZSI6ImtleWJhc2UuaW8gZ28gY2xpZW50IiwidmVyc2lvbiI6IjEuMC4zNiJ9LCJjdGltZSI6MTUxMTYwNTE5MCwiZXhwaXJlX2luIjo1MDQ1NzYwMDAsInByZXYiOiJjOWFhOWQ3YTFiMWQ3NzRlYjFhODM4YmIzNjBmYWZjZTg4MDhmMDhhYWI5ZTEzMTFlMjQ0OGE3NWFjZDQwYTRkIiwic2Vxbm8iOjExLCJ0YWciOiJzaWduYXR1cmUifaNzaWfEQM3oK4k58hXeGa+deUByGnwW2i8zd1frnTzbgncJUBb6FtaueM+YHG4Nva7WBSr3cti5DqEjf1JNbgPVEOaEmgSoc2lnX3R5cGUgpGhhc2iCpHR5cGUIpXZhbHVlxCCmx4/yG8dbmOUizoOpTpjW6TOe5EoipLnlhX7IyKPZg6N0YWfNAgKndmVyc2lvbgE=
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/amirali
+
+==================================================================
